@@ -1,5 +1,5 @@
 import { prisma } from '../prisma.js'
-import type { Ride, RideFilters, NewRideInput, Review, User } from '../types/index.js'
+import type { Ride, RideFilters, NewRideInput, Review } from '../types/index.js'
 import { isPast, todayISO } from '../utils/format.js'
 
 /** Complète un trajet stocké avec le conducteur, sa note et les places restantes. */
@@ -57,7 +57,7 @@ export async function getReviews(driverId: string): Promise<Review[]> {
   return prisma.review.findMany({ where: { driverId } })
 }
 
-export async function createRide(input: NewRideInput, driver: Pick<User, 'id'>): Promise<Ride> {
+export async function createRide(input: NewRideInput, driver: { id: string }): Promise<Ride> {
   const stored = await prisma.ride.create({
     data: {
       driverId: driver.id,
@@ -71,9 +71,7 @@ export async function createRide(input: NewRideInput, driver: Pick<User, 'id'>):
       options: input.options,
     },
   })
-  const ride = await getRide(stored.id)
-  if (!ride) throw new Error('Trajet introuvable après création.')
-  return ride
+  return getRide(stored.id) as Promise<Ride>
 }
 
 export async function listMyRides(userId: string): Promise<Ride[]> {

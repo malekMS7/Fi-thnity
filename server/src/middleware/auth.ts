@@ -1,10 +1,11 @@
-import type { NextFunction, Request, Response } from 'express'
+import type { Request, Response, NextFunction } from 'express'
 import { verifyToken } from '../utils/jwt.js'
-import type { Role } from '../types/index.js'
 
 export interface AuthenticatedRequest extends Request {
   user?: { id: string; role: Role }
 }
+
+import type { Role } from '../types/index.js'
 
 export function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const auth = req.headers.authorization

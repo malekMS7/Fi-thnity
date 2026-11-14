@@ -13,7 +13,6 @@ async function main() {
   ])
 
   const [walid, ines, karim, yosra] = users
-  if (!walid || !ines || !karim || !yosra) throw new Error('Seed : utilisateurs introuvables.')
 
   const inDays = (n: number) => {
     const d = new Date()

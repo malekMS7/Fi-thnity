@@ -3,10 +3,6 @@ import { defineConfig, env } from 'prisma/config'
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
-  datasource: {
-    url: env('DATABASE_URL'),
-  },
-  migrations: {
-    seed: 'tsx prisma/seed.ts',
-  },
+  // Prisma 7 : l'URL de la base n'est plus dans schema.prisma mais ici.
+  datasource: { url: env('DATABASE_URL') },
 })

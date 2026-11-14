@@ -1,9 +1,9 @@
 import { prisma } from '../prisma.js'
-import type { Booking, BookingStatus, BookingWithRide, User } from '../types/index.js'
+import type { Booking, BookingStatus, BookingWithRide } from '../types/index.js'
 import { isPast } from '../utils/format.js'
 import { enrich } from './rides.service.js'
 
-export async function createBooking(rideId: string, user: Pick<User, 'id'>, seats: number): Promise<Booking> {
+export async function createBooking(rideId: string, user: { id: string }, seats: number): Promise<Booking> {
   const stored = await prisma.ride.findUnique({ where: { id: rideId } })
   if (!stored) throw new Error('Trajet introuvable.')
 
@@ -21,9 +21,11 @@ export async function createBooking(rideId: string, user: Pick<User, 'id'>, seat
   })
   if (already && already.status === 'CONFIRMED') throw new Error('Tu as déjà réservé ce trajet.')
 
-  const booking = await prisma.booking.create({
-    data: { rideId, passengerId: user.id, seats, status: 'CONFIRMED' },
-  })
+  // Une réservation annulée existe encore en base (contrainte unique rideId + passengerId) :
+  // on la réactive au lieu d'en créer une seconde.
+  const booking = already
+    ? await prisma.booking.update({ where: { id: already.id }, data: { seats, status: 'CONFIRMED' } })
+    : await prisma.booking.create({ data: { rideId, passengerId: user.id, seats, status: 'CONFIRMED' } })
   return {
     id: booking.id,
     rideId: booking.rideId,

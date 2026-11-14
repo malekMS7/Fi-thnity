@@ -1,5 +1,4 @@
 import { PrismaPg } from '@prisma/adapter-pg'
-import { Pool } from 'pg'
 import { env } from './config/index.js'
 import { PrismaClient } from './generated/prisma/client.js'
 
@@ -8,8 +7,8 @@ declare global {
   var prisma: PrismaClient | undefined
 }
 
-const pool = new Pool({ connectionString: env.DATABASE_URL })
-const adapter = new PrismaPg(pool)
+// Prisma 7 : le client se connecte via un « driver adapter » (ici PostgreSQL).
+const adapter = new PrismaPg({ connectionString: env.DATABASE_URL })
 
 // Évite de créer une instance à chaque hot-reload en développement (tsx watch).
 export const prisma = global.prisma ?? new PrismaClient({ adapter })

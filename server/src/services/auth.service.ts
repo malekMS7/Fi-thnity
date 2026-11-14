@@ -1,14 +1,19 @@
 import { hash, compare } from 'bcrypt'
 import { prisma } from '../prisma.js'
-import type { User, RegisterInput, Role } from '../types/index.js'
+import type { Role, User } from '../types/index.js'
 import { signToken } from '../utils/jwt.js'
 
-const toUser = (u: { id: string; name: string; email: string; phone: string | null; role: Role }): User => ({
-  id: u.id,
-  name: u.name,
-  email: u.email,
-  ...(u.phone !== null ? { phone: u.phone } : {}),
-  role: u.role,
+export interface RegisterInput {
+  name: string
+  email: string
+  phone?: string
+  password: string
+  role: Role
+}
+
+// Prisma renvoie phone = null quand il est absent ; le type User attend « absent » (undefined).
+const toUser = (u: { id: string; name: string; email: string; phone?: string | null; role: Role }): User => ({
+  id: u.id, name: u.name, email: u.email, role: u.role, ...(u.phone ? { phone: u.phone } : {}),
 })
 
 export async function register(input: RegisterInput): Promise<{ token: string; user: User }> {

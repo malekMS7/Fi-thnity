@@ -1,13 +1,5 @@
 export type Role = 'DRIVER' | 'PASSENGER'
 
-export interface RegisterInput {
-  name: string
-  email: string
-  phone?: string
-  password: string
-  role: Role
-}
-
 export interface User {
   id: string
   name: string
