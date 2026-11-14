@@ -1,75 +1,42 @@
-# React + TypeScript + Vite
+# Fi thnity — client Angular
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Version Angular 22 du client (remplace l'ancien client React/Vite). Mêmes pages, même design (Tailwind v4 + charte graphique), mêmes données de démonstration, même clé `localStorage`.
 
-Currently, two official plugins are available:
+## Lancer le projet
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+cd client
+npm install
+npm start          # http://localhost:4200  (le proxy /api → http://localhost:4000 est configuré)
+npm run build      # sortie dans dist/fithnity/browser
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Prérequis : Node 22.22.3+ (ou 24.15+). Angular 22 demande TypeScript 6.0.x (`~6.0.2` dans package.json), pas 7.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Correspondance React → Angular
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| React | Angular |
+|---|---|
+| `main.tsx` + `BrowserRouter` | `main.ts` + `app.config.ts` (`provideRouter`) |
+| `App.tsx` (`<Routes>`) | `app.routes.ts` |
+| `Layout` + `<Outlet/>` | `LayoutComponent` + `<router-outlet/>` |
+| `ProtectedRoute` | `core/auth.guard.ts` (`canActivate`) |
+| `AuthContext` / `useAuth()` | `core/session.service.ts` (`SessionService`, signals) |
+| `useState` | `signal()` / `computed()` |
+| `useEffect` | `ngOnInit`, `toSignal(...)`, abonnement RxJS |
+| `useNavigate` / `Link` / `NavLink` | `Router` / `routerLink` / `routerLinkActive` |
+| `useSearchParams` | `ActivatedRoute.queryParamMap` |
+| `Button`, `Field` (props) | `button[app-button]`, `<app-field>` (inputs/`model`) |
+| `RideCard`, `Rating` | `li[app-ride-card]`, `<app-rating>` |
+| `formatDate`, `formatPrice` dans le JSX | pipes `formatDate`, `formatPrice` |
+| `services/*.ts` (fonctions) | `services/*.service.ts` (classes `@Injectable`) |
+| `api.ts` (axios) | `services/api.service.ts` (`HttpClient`) + `core/auth.interceptor.ts` |
+| `import.meta.env.VITE_API_URL` | `src/environments/environment.ts` |
+| `{cond && <X/>}`, `.map()` | `@if`, `@for` |
 
-```
+## Remarques
+
+- Les pages continuent d'utiliser la base simulée (`services/db.service.ts`). Quand l'API Express sera branchée, seul le dossier `services/` change.
+- `ApiService` n'est pas encore utilisé par les pages (comme `api.ts` en React) : il est prêt pour le branchement.
+- Dans un template Angular, `@` est un caractère spécial : écrire `&#64;` pour afficher une adresse email (ex. `walid&#64;demo.tn`).
+- Fichiers React non repris : `hero.png`, `react.svg`, `vite.svg` (non utilisés), `.oxlintrc.json`.

@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/* Charte graphique Fi thnity : ces valeurs deviennent des classes Tailwind
+   (bg-nuit, text-soleil, border-ardoise, font-titre, etc.) */
+@theme {
+  --color-nuit: #0F2A33;
+  --color-soleil: #F4B63F;
+  --color-papier: #F7F4EC;
+  --color-menthe: #23705A;
+  --color-corail: #B8402A;
+  --color-ardoise: #5F7078;
+  --color-filet: #DDD8CA;
+
+  --font-titre: "Poppins", Georgia, serif;
+  --font-texte: "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  --radius-charte: 4px;
+}
+
+@layer base {
+  body {
+    @apply bg-papier font-texte text-nuit antialiased;
+  }
+  h1, h2, h3 {
+    @apply font-titre font-semibold;
+  }
+  /* Focus visible pour l'accessibilité clavier */
+  :focus-visible {
+    outline: 3px solid var(--color-soleil);
+    outline-offset: 2px;
+  }
+}

@@ -1,24 +1,20 @@
+# Sortie de build
+/dist
+/out-tsc
+
+# Dépendances
+/node_modules
+
+# Cache Angular
+/.angular/cache
+.sass-cache/
+
 # Logs
-logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
+# Éditeurs
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?

@@ -1,0 +1,79 @@
+// Schéma de base de données pour Fi-thnity (covoiturage).
+// Correspond aux types définis dans client/src/types/index.ts.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  password  String   // hashé avec bcrypt
+  role      Role     @default(PASSENGER)
+  rides     Ride[]
+  bookings  Booking[]
+  reviews   Review[]
+
+  @@index([email])
+}
+
+model Ride {
+  id           String   @id @default(cuid())
+  driverId     String
+  driver       User     @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  from         String
+  to           String
+  date         String   // AAAA-MM-JJ
+  time         String   // HH:MM
+  seats        Int
+  price        Int      // en dinars
+  meetingPoint String
+  options      String[]
+  bookings     Booking[]
+
+  @@index([driverId])
+  @@index([date])
+}
+
+model Booking {
+  id         String         @id @default(cuid())
+  rideId     String
+  ride       Ride           @relation(fields: [rideId], references: [id], onDelete: Cascade)
+  passengerId String
+  passenger  User           @relation(fields: [passengerId], references: [id], onDelete: Cascade)
+  seats      Int
+  status     BookingStatus  @default(CONFIRMED)
+  createdAt  DateTime       @default(now())
+
+  @@unique([rideId, passengerId])
+  @@index([passengerId])
+  @@index([rideId])
+}
+
+model Review {
+  id         String @id @default(cuid())
+  driverId   String
+  driver     User   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  authorName String
+  rating     Int
+  comment    String
+
+  @@index([driverId])
+}
+
+enum Role {
+  DRIVER
+  PASSENGER
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+}

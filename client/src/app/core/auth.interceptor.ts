@@ -1,0 +1,11 @@
+import type { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { environment } from '../../environments/environment';
+import { SessionService } from './session.service';
+
+/** Remplace setToken() / restoreToken() d'axios : ajoute « Authorization: Bearer … » aux appels vers l'API. */
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const token = inject(SessionService).token();
+  if (!token || !req.url.startsWith(environment.apiUrl)) return next(req);
+  return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
+};
