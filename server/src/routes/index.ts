@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { requireAuth, requireRole, type AuthenticatedRequest } from '../middleware/auth.js'
 import { register, login } from '../services/auth.service.js'
-import { listRides, getRide, createRide, listMyRides } from '../services/rides.service.js'
+import { listRides, getRide, createRide, listMyRides, getReviews } from '../services/rides.service.js'
 import { createBooking, listMyBookings, cancelBooking } from '../services/bookings.service.js'
 import type { RideFilters } from '../types/index.js'
 
@@ -67,6 +67,15 @@ router.post('/rides', requireAuth, requireRole('DRIVER'), async (req: Authentica
     res.json(await createRide(req.body, { id: req.user!.id }))
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
+  }
+})
+
+// Avis d'un conducteur (public : affichés sur la fiche d'un trajet)
+router.get('/reviews/:driverId', async (req, res) => {
+  try {
+    res.json(await getReviews(String(req.params.driverId)))
+  } catch (e) {
+    res.status(500).json({ error: (e as Error).message })
   }
 })
 
