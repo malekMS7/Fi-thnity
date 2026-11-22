@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import type { Role, User } from '../types';
-import { DbService } from './db.service';
+import { ApiService } from './api.service';
 
 export interface RegisterInput {
   name: string;
@@ -14,25 +14,18 @@ const toUser = (u: { id: string; name: string; email: string; phone?: string; ro
   id: u.id, name: u.name, email: u.email, phone: u.phone, role: u.role,
 });
 
-/** Inscription / connexion (simulées). L'état de la session est dans SessionService. */
+/** Inscription / connexion via l'API Express. L'état de la session est dans SessionService. */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly dbService = inject(DbService);
+  private readonly api = inject(ApiService);
 
   async register(input: RegisterInput): Promise<{ token: string; user: User }> {
-    const db = this.dbService.load();
-    const email = input.email.trim().toLowerCase();
-    if (db.users.some((u) => u.email === email)) throw new Error('Un compte existe déjà avec cet email.');
-    const stored = { id: this.dbService.newId('u'), ...input, name: input.name.trim(), email };
-    db.users.push(stored);
-    this.dbService.save(db);
-    return { token: `token-${stored.id}`, user: toUser(stored) };
+    const { token, user } = await this.api.auth.register(input);
+    return { token, user: toUser(user) };
   }
 
   async login(email: string, password: string): Promise<{ token: string; user: User }> {
-    const db = this.dbService.load();
-    const found = db.users.find((u) => u.email === email.trim().toLowerCase() && u.password === password);
-    if (!found) throw new Error('Email ou mot de passe incorrect.');
-    return { token: `token-${found.id}`, user: toUser(found) };
+    const { token, user } = await this.api.auth.login(email, password);
+    return { token, user: toUser(user) };
   }
 }
