@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import type { NewRideInput, Ride, RideFilters, User } from '../types';
+import type { NewRideInput, Review, Ride, RideFilters, User } from '../types';
 import { ApiService } from './api.service';
 
 @Injectable({ providedIn: 'root' })
@@ -12,6 +12,10 @@ export class RidesService {
 
   async getRide(id: string): Promise<Ride | null> {
     return await this.api.rides.get(id);
+  }
+
+  async getReviews(driverId: string): Promise<Review[]> {
+    return await this.api.rides.reviews(driverId);
   }
 
   async createRide(input: NewRideInput, driver: User): Promise<Ride> {
