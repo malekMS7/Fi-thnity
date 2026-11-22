@@ -12,7 +12,12 @@ let nextId = 0;
   selector: 'app-field',
   host: { class: 'block' },
   template: `
-    <label [attr.for]="id" class="block text-sm font-medium">{{ label() }}</label>
+    <label [attr.for]="id" class="block text-sm font-medium">
+      {{ label() }}
+      @if (required()) {
+        <span class="text-corail font-bold ml-0.5" aria-hidden="true">*</span>
+      }
+    </label>
     <input
       [id]="id"
       [type]="type()"
@@ -22,6 +27,7 @@ let nextId = 0;
       [attr.min]="min()"
       [attr.max]="max()"
       [attr.autocomplete]="autocomplete()"
+      [attr.list]="list()"
       [attr.aria-invalid]="!!error()"
       [attr.aria-describedby]="error() ? id + '-err' : null"
       [class]="inputClass()"
@@ -38,6 +44,7 @@ export class FieldComponent {
   readonly min = input<string | number | null>(null);
   readonly max = input<string | number | null>(null);
   readonly autocomplete = input<string | null>(null);
+  readonly list = input<string | null>(null);
   readonly required = input(false, { transform: booleanAttribute });
   readonly value = model('');
 

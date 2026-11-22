@@ -33,6 +33,13 @@ export class SessionService {
     localStorage.setItem(KEY, JSON.stringify({ token, user }));
   }
 
+  updateUser(user: User): void {
+    const current = this.state();
+    if (!current.token) return;
+    this.state.set({ ...current, user });
+    localStorage.setItem(KEY, JSON.stringify({ token: current.token, user }));
+  }
+
   logout(): void {
     this.state.set({ token: null, user: null });
     localStorage.removeItem(KEY);

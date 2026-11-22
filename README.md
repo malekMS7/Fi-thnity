@@ -2,73 +2,107 @@
 
 > Partage la route, partage les frais.
 
-**Projet Web, Objectif 3 : développement et intégration des fonctionnalités principales** · Groupe 11 · [Prénom Nom], [Prénom Nom], [Prénom Nom] · Encadrant : [Dr. Prénom Nom] · SUP'COM, Université de Carthage · Année universitaire 2026/2027
+## À propos du projet
 
-Fi thnity est une plateforme de **covoiturage** pensée pour les étudiants et les actifs en Tunisie. Le site réunit deux rôles :
+Nous sommes **Mohamed Laabidi** et **Maled slema**, deux étudiants qui ont créé Fi thnity dans le but de faciliter le covoiturage en Tunisie.
 
-- **Le conducteur** publie un trajet (départ, arrivée, date, heure, places, prix, point de rendez-vous, options) et suit ses réservations depuis son tableau de bord.
-- **Le passager** cherche un trajet avec des filtres, consulte la fiche du conducteur (note moyenne, avis), réserve des places et peut annuler sa réservation.
+Fi thnity est un site où une personne peut proposer un trajet et où d'autres personnes peuvent chercher une place. Nous avons essayé de faire une application simple à comprendre, aussi bien pour le conducteur que pour le passager.
 
-Le rôle est choisi à l'inscription. Dans tous les cas, on ne peut pas réserver son propre trajet.
+Le conducteur peut :
 
-> Le client Angular fonctionne aujourd'hui avec des **données de démonstration** enregistrées dans le navigateur. L'API Express + PostgreSQL est écrite et testable séparément ; le branchement du site sur cette API est la prochaine étape (voir sections 8 et 9).
+- publier un trajet avec le départ, l'arrivée, la date, l'heure, le nombre de places et le prix ;
+- voir ses trajets et ses réservations ;
+- annuler un trajet si nécessaire.
+
+Le passager peut :
+
+- chercher un trajet par ville et par date ;
+- utiliser des filtres pour trouver plus facilement un trajet ;
+- consulter les informations du conducteur et ses avis ;
+- réserver une ou plusieurs places ;
+- annuler sa réservation et donner une note au conducteur.
+
+Un utilisateur ne peut pas réserver son propre trajet ni se donner une note. Le rôle choisi lors de l'inscription peut être modifié dans le profil.
+
+Pour le moment, le site fonctionne surtout avec une petite base de données simulée dans le navigateur. Les informations sont conservées dans `localStorage`. Une API Express et une base PostgreSQL sont aussi préparées pour la prochaine étape.
 
 ---
 
-## 1. Choix technologiques
+## 1. Les technologies utilisées
 
-| Couche | Technologie | Pourquoi ce choix |
+Nous avons choisi des technologies que nous pouvions apprendre et utiliser ensemble :
+
+| Partie | Technologie | Utilisation |
 |---|---|---|
-| Interface | **Angular 22** | Le site est fait de composants autonomes (*standalone*) réutilisés partout : bouton, champ de formulaire, carte de trajet, note du conducteur. L'état (session, formulaires, résultats) repose sur les *signals*, et les listes et conditions utilisent la syntaxe `@if` / `@for`. |
-| Navigation | **Angular Router** | Une application monopage avec 8 routes. Les filtres de recherche sont dans l'adresse (`/trajets?depart=Sfax&prixMax=20`) : une recherche peut être partagée et le bouton Retour fonctionne. Un *guard* protège les pages réservées aux comptes connectés. |
-| Outil de build | **Angular CLI** (`@angular/build`) | Serveur de développement avec rechargement, build de production optimisé, et un *proxy* qui transmet `/api` au serveur Node. |
-| Style | **Tailwind CSS v4** + jetons de la charte | La charte graphique (couleurs, polices, rayon des angles) est centralisée dans `client/src/styles.css` et devient des classes (`bg-nuit`, `text-corail`, `font-titre`…). |
-| Backend | **Node.js + Express 5 + TypeScript** | Le même langage côté navigateur et côté serveur. Express suffit pour une API REST de taille moyenne et se lit facilement. |
-| Données | **PostgreSQL + Prisma 7** | Un vrai modèle relationnel (utilisateurs, trajets, réservations, avis) avec des contraintes (une réservation par passager et par trajet). Prisma génère un client typé et se connecte via l'adaptateur `@prisma/adapter-pg`. |
-| Authentification | **JWT + bcrypt** | Jeton signé valable 7 jours, mots de passe hachés avec bcrypt. |
-| Configuration | **zod** | Le serveur refuse de démarrer si `DATABASE_URL` ou `JWT_SECRET` (32 caractères minimum) sont absents ou invalides. |
-| Qualité | **TypeScript strict** + **oxlint** | Le client compile avec `strictTemplates` (les templates sont vérifiés comme du code). Le serveur est vérifié par `tsc` et `oxlint`. |
+| Site web | **Angular 22** | Création des pages et des composants du site. |
+| Style | **Tailwind CSS v4** | Mise en forme, couleurs et affichage responsive. |
+| Serveur | **Node.js, Express 5 et TypeScript** | Préparation de l'API du projet. |
+| Base de données | **PostgreSQL et Prisma 7** | Stockage des utilisateurs, trajets, réservations et avis. |
+| Connexion | **JWT et bcrypt** | Préparation de la connexion et protection des mots de passe côté API. |
+| Validation | **zod** | Vérification de la configuration du serveur. |
+| Qualité | **TypeScript strict et règles d'accessibilité** | Réduire les erreurs et rendre le site plus facile à utiliser. |
 
-La charte graphique utilise : **nuit** `#0F2A33`, **soleil** `#F4B63F`, **papier** `#F7F4EC`, **menthe** `#23705A`, **corail** `#B8402A`, **ardoise** `#5F7078`, **filet** `#DDD8CA` ; polices **Poppins** (titres) et **Inter** (texte).
+Nous avons aussi utilisé :
+
+- le chargement différé (*lazy loading*) pour charger les pages quand elles sont nécessaires ;
+- des écrans de chargement (*skeletons*) pour rendre l'attente plus agréable ;
+- des notifications pour informer l'utilisateur après une action ;
+- des fenêtres modales accessibles ;
+- des formulaires avec des messages d'erreur clairs ;
+- un affichage adapté aux téléphones et aux ordinateurs.
+
+Les principales couleurs du projet sont le bleu nuit, le jaune, le blanc cassé, le vert et le corail. Les polices utilisées sont **Poppins** pour les titres et **Inter** pour le texte.
 
 ---
 
-## 2. Fonctionnalités développées
+## 2. Ce que l'on peut faire sur le site
 
-| Page | Adresse | Fonctionnalités |
+| Page | Adresse | Ce qu'elle permet de faire |
 |---|---|---|
-| Accueil | `/` | Présentation et formulaire de recherche rapide (départ, arrivée, date) qui ouvre la liste des résultats |
-| Trouver un trajet | `/trajets` | Recherche par départ, arrivée et date (insensible à la casse), 3 filtres rapides (prix ≤ 20 DT, départ le matin, places ≥ 2), compteur de résultats, tri par date et heure, trajets passés masqués |
-| Fiche d'un trajet | `/trajets/:id` | Itinéraire, date, point de rendez-vous, places restantes, prix, options, note du conducteur et jusqu'à 3 avis, choix du nombre de places, bouton **Réserver** avec le prix total |
-| Publier un trajet | `/publier` 🔒 | Formulaire validé champ par champ : villes différentes, date et heure dans le futur, 1 à 8 places, prix, point de rendez-vous, options |
-| Tableau de bord | `/tableau-de-bord` 🔒 | Compteurs (réservations à venir, trajets publiés, passagers), liste de mes réservations avec annulation confirmée, liste de mes trajets avec le remplissage |
-| Inscription | `/inscription` | Nom, email, téléphone (optionnel), mot de passe, rôle principal ; validation avec message sous chaque champ |
-| Connexion | `/connexion` | Email et mot de passe, erreur claire, retour automatique vers la page demandée avant la connexion |
-| Page introuvable | toute autre adresse | Page 404 dans le style du site |
+| Accueil | `/` | Découvrir le site et commencer une recherche rapidement. |
+| Trouver un trajet | `/trajets` | Rechercher par départ, arrivée et date, puis filtrer les résultats. |
+| Détails d'un trajet | `/trajets/:id` | Voir le trajet, le conducteur, les places disponibles et réserver. |
+| Publier un trajet | `/publier` | Ajouter un trajet avec toutes ses informations. |
+| Tableau de bord | `/tableau-de-bord` | Voir ses réservations et ses trajets publiés. |
+| Profil | `/profil` | Modifier son nom, son téléphone, sa bio et son rôle. |
+| Contact et FAQ | `/contact` | Envoyer un message et consulter les questions fréquentes. |
+| Inscription | `/inscription` | Créer un compte comme conducteur ou passager. |
+| Connexion | `/connexion` | Se connecter à son compte. |
+| Page 404 | Toute autre adresse | Afficher un message quand la page n'existe pas. |
 
-🔒 : réservé aux comptes connectés. Un visiteur non connecté est redirigé vers `/connexion`, puis ramené à la page qu'il voulait ouvrir.
+Les pages `/publier` et `/tableau-de-bord` demandent d'être connecté. Si un visiteur essaie de les ouvrir, il est envoyé vers la page de connexion puis revient à la page demandée.
 
-**Sur tout le site :**
+Sur l'ensemble du site :
 
-- **Règles de réservation** : on ne peut pas réserver son propre trajet, un trajet passé ou complet, ni réserver deux fois le même trajet ; le nombre de places demandé ne peut pas dépasser les places restantes.
-- **Calculs automatiques** : places restantes (places offertes moins places réservées confirmées) et note moyenne du conducteur, affichée « Nouveau » tant qu'il n'a aucun avis.
-- **Formulaires** : un message d'erreur commençant par « Error » apparaît sous le champ concerné, relié au champ pour les lecteurs d'écran (`aria-describedby`, `aria-invalid`).
-- **Session** : conservée au rechargement de la page, déconnexion depuis la barre de navigation.
-- **Responsive** : menu repliable sur téléphone, grilles qui s'adaptent à la largeur.
-- **Accessibilité** : balises sémantiques, libellés visibles, focus visible, cibles tactiles d'au moins 44 px, filtres annoncés avec `aria-pressed`, résultats annoncés avec `aria-live`.
+- un trajet passé ou complet ne peut pas être réservé ;
+- un même trajet ne peut pas être réservé deux fois par la même personne ;
+- le nombre de places demandé doit être disponible ;
+- les places restantes et la moyenne des notes sont calculées automatiquement ;
+- les erreurs sont affichées directement sous les champs concernés ;
+- la session reste active après un rechargement de la page ;
+- le menu s'adapte aux petits écrans ;
+- les boutons, les formulaires et les messages sont pensés pour être accessibles.
 
 ---
 
-## 3. Lancement du projet
+## 3. Installer et lancer le projet
 
-**Prérequis :** [Node.js](https://nodejs.org) 22.22.3 ou plus récent (24.15+ accepté) et Git. [PostgreSQL](https://www.postgresql.org) n'est nécessaire que pour lancer l'API.
+### Ce qu'il faut installer
+
+- [Node.js](https://nodejs.org) version 22.22.3 ou plus récente ;
+- [Git](https://git-scm.com) ;
+- [PostgreSQL](https://www.postgresql.org), seulement si l'on veut lancer l'API.
+
+### Télécharger le projet
 
 ```bash
 git clone <adresse-du-dépôt>
 cd Fi-thnity
 ```
 
-### A. Le site seul (mode démonstration, sans base de données)
+### A. Lancer seulement le site
+
+Cette méthode est la plus simple. Elle fonctionne sans PostgreSQL.
 
 ```bash
 cd client
@@ -76,68 +110,81 @@ npm install
 npm start
 ```
 
-- Site : <http://localhost:4200>
+Le site sera disponible ici : <http://localhost:4200>
 
-Les trajets, comptes et réservations sont enregistrés dans le navigateur (`localStorage`). Pour repartir de zéro, vider les données du site dans les outils du navigateur.
+Dans ce mode, les trajets, les comptes et les réservations sont enregistrés dans le navigateur. Pour recommencer avec des données propres, il faut supprimer les données du site dans les outils du navigateur.
 
-**Comptes de démonstration** (mot de passe : `demo1234`) :
+Comptes de démonstration (mot de passe : `demo1234`) :
 
 | Email | Rôle |
 |---|---|
-| `walid@demo.tn` | Conducteur (4,7 / 5, 3 avis) |
+| `walid@demo.tn` | Conducteur avec une note et des avis |
 | `ines@demo.tn`, `karim@demo.tn`, `yosra@demo.tn` | Conducteurs |
 | `sarra@demo.tn` | Passagère |
 
-### B. L'API (Express + PostgreSQL)
+### B. Lancer l'API
+
+Pour lancer la partie serveur, il faut avoir PostgreSQL installé et une base de données disponible.
 
 ```bash
 cd server
 npm install
-cp .env.example .env        # puis renseigner DATABASE_URL et JWT_SECRET
-npm run db:generate         # génère le client Prisma (src/generated/prisma)
-npm run db:push             # crée les tables dans PostgreSQL
-npm run db:seed             # comptes, trajets et avis de démonstration
+cp .env.example .env
+```
+
+Ensuite, il faut renseigner `DATABASE_URL` et `JWT_SECRET` dans le fichier `.env`, puis lancer :
+
+```bash
+npm run db:generate
+npm run db:push
+npm run db:seed
 npm run dev
 ```
 
-- API : <http://localhost:4000>
-- <http://localhost:4000/health> doit répondre `{"ok":true}`
+L'API sera disponible ici : <http://localhost:4000>
 
-Variables du fichier `.env` :
+La page <http://localhost:4000/health> doit afficher :
 
-| Variable | Rôle | Exemple |
+```json
+{"ok":true}
+```
+
+Variables importantes du fichier `.env` :
+
+| Variable | À quoi elle sert | Exemple |
 |---|---|---|
 | `PORT` | Port du serveur | `4000` |
-| `DATABASE_URL` | Connexion PostgreSQL | `postgres://user:password@localhost:5432/fithnity` |
-| `JWT_SECRET` | Secret de signature des jetons (32 caractères minimum) | une longue chaîne aléatoire |
-| `CORS_ORIGINS` | Origines autorisées, séparées par des virgules | `http://localhost:4200` |
+| `DATABASE_URL` | Adresse de la base PostgreSQL | `postgresql://localhost:5432/fithnity` |
+| `JWT_SECRET` | Secret utilisé pour les connexions | Une longue chaîne aléatoire |
+| `CORS_ORIGINS` | Adresses autorisées à appeler l'API | `http://localhost:4200` |
 
-> Relancer `npm run db:seed` ajoute une seconde fois les trajets de démonstration. Pour repartir d'une base propre : `npx prisma db push --force-reset` puis `npm run db:seed`.
+Pour remettre la base à zéro avant de remettre les données de démonstration :
 
-Pour la production : `npm run build` puis `npm start` (serveur) ; `npm run build` dans `client/` produit le site dans `client/dist/fithnity/browser`.
+```bash
+npx prisma db push --force-reset
+npm run db:seed
+```
 
 ---
 
 ## 4. API REST
 
-Toutes les adresses commencent par `/api`, sauf `/health`. Les routes marquées 🔒 demandent l'en-tête `Authorization: Bearer <token>` reçu à la connexion. Les erreurs ont la forme `{ "error": "<message>" }`.
+Les routes de l'API commencent par `/api`, sauf la route `/health`. Les routes avec 🔒 demandent une connexion.
 
-| Méthode | Adresse | Corps / paramètres | Réponse |
-|---|---|---|---|
-| GET | `/health` | | `200 { ok: true }` |
-| POST | `/api/auth/register` | `{ name, email, phone?, password, role }` | `200 { token, user }` · `400` email déjà pris |
-| POST | `/api/auth/login` | `{ email, password }` | `200 { token, user }` · `401` |
-| GET | `/api/rides` | `?depart=&arrivee=&date=&prixMax=&placesMin=&matin=` | `200 [trajets]` |
-| GET | `/api/rides/mine` 🔒 | | `200 [trajets]` · `401` |
-| GET | `/api/rides/:id` | | `200 trajet` · `404` |
-| POST | `/api/rides` 🔒 (conducteur) | `{ from, to, date, time, seats, price, meetingPoint, options }` | `200 trajet` · `400` · `401` · `403` |
-| POST | `/api/bookings` 🔒 | `{ rideId, seats }` | `201 réservation` · `400` |
-| GET | `/api/bookings/mine` 🔒 | | `200 [réservations avec leur trajet]` |
-| DELETE | `/api/bookings/:id` 🔒 | | `204` · `400` |
+| Méthode | Adresse | Utilisation |
+|---|---|---|
+| GET | `/health` | Vérifier que le serveur fonctionne. |
+| POST | `/api/auth/register` | Créer un compte. |
+| POST | `/api/auth/login` | Se connecter. |
+| GET | `/api/rides` | Chercher des trajets. |
+| GET | `/api/rides/mine` 🔒 | Voir ses trajets. |
+| GET | `/api/rides/:id` | Voir les détails d'un trajet. |
+| POST | `/api/rides` 🔒 | Publier un trajet. |
+| POST | `/api/bookings` 🔒 | Réserver des places. |
+| GET | `/api/bookings/mine` 🔒 | Voir ses réservations. |
+| DELETE | `/api/bookings/:id` 🔒 | Annuler une réservation. |
 
-Le filtre `matin` accepte `1` ou `true` (départ avant 12 h). Les mots de passe sont hachés avec **bcrypt** et ne sont jamais stockés en clair.
-
-Exemple :
+Exemple pour se connecter avec l'API :
 
 ```bash
 curl -X POST http://localhost:4000/api/auth/login \
@@ -145,103 +192,110 @@ curl -X POST http://localhost:4000/api/auth/login \
   -d '{"email":"sarra@demo.tn","password":"demo1234"}'
 ```
 
+Les mots de passe de l'API sont protégés avec **bcrypt** et ne sont pas enregistrés en clair.
+
 ---
 
-## 5. Vérifications et tests
+## 5. Vérifier le projet
 
-Le projet n'a pas encore de tests automatisés (voir section 9). Les contrôles disponibles :
+Il n'y a pas encore de tests automatisés. Pour vérifier que le projet fonctionne, nous utilisons les commandes suivantes.
+
+Pour vérifier le site :
 
 ```bash
-# Client : compile tout, y compris les templates (strictTemplates)
-cd client && npm run build
+cd client
+npm run build
+```
 
-# Serveur : typage, lint, validation du schéma
+Pour vérifier le serveur :
+
+```bash
 cd server
 npx tsc --noEmit
 npm run lint
 npx prisma validate
 ```
 
-**Parcours à tester à la main (mode démonstration) :**
+Nous vérifions aussi manuellement les parcours suivants :
 
-- **A** : Accueil → rechercher Sfax → Tunis → filtre « Prix ≤ 20 DT » → ouvrir un trajet → réserver (connexion demandée, puis retour sur le trajet) → Tableau de bord.
-- **B** : Inscription (essayer d'abord avec des champs invalides) → Publier un trajet → vérifier qu'il apparaît dans la recherche.
-- **C** : Se connecter avec `sarra@demo.tn` → réserver 2 places → annuler la réservation → vérifier que les places sont rendues.
-- **Cas limites** : réserver son propre trajet, réserver deux fois, ouvrir `/publier` sans être connecté, ouvrir une adresse inexistante.
+- rechercher un trajet de Sfax vers Tunis et le réserver ;
+- créer un compte avec des informations incorrectes pour voir les messages d'erreur ;
+- publier un trajet et vérifier qu'il apparaît dans la recherche ;
+- réserver puis annuler une réservation ;
+- essayer de réserver son propre trajet ;
+- essayer d'ouvrir une page réservée sans être connecté ;
+- ouvrir une adresse qui n'existe pas pour vérifier la page 404.
 
 ---
 
-## 6. Structure du projet
+## 6. Organisation des fichiers
 
 ```text
-client/                         Site Angular
-  angular.json                  configuration du build, proxy /api
-  proxy.conf.json               /api → http://localhost:4000
-  public/                       favicon et icônes
+client/                         Partie visible du site Angular
+  angular.json                  Configuration du projet
+  proxy.conf.json               Redirection de /api vers le serveur
+  public/                       Icônes et fichiers publics
   src/
-    index.html  main.ts         page et démarrage
-    styles.css                  Tailwind + charte graphique
-    environments/               adresse de l'API
+    index.html                  Page HTML principale
+    main.ts                     Démarrage de l'application
+    styles.css                  Styles et couleurs du projet
+    environments/               Adresse de l'API
     app/
-      app.routes.ts             les routes du site
-      app.config.ts             router, HttpClient, intercepteur
-      core/                     session.service (connexion), auth.guard, auth.interceptor
-      components/               layout (navbar, footer), ui (button, field), ride-card, rating
-      pages/                    une page par fichier (home, rides, ride-detail, publish-ride…)
-      services/                 base simulée (db, auth, rides, bookings) + api.service (HTTP)
-      types/                    types partagés (User, Ride, Booking…)
-      utils/                    format de dates et de prix, pipes
-server/                         API Express
-  prisma/
-    schema.prisma               modèle de données (User, Ride, Booking, Review)
-    seed.ts                     données de démonstration
-  prisma.config.ts              configuration Prisma 7 (URL de la base)
+      app.routes.ts             Routes du site
+      app.config.ts             Configuration Angular
+      core/                     Session et protection des pages
+      components/               Composants réutilisables
+      pages/                    Pages du site
+      services/                 Données simulées et services API
+      types/                    Types utilisés dans le projet
+      utils/                    Fonctions utiles
+server/                         Partie serveur Express
+  prisma/                       Modèle et données de démonstration
   src/
-    index.ts                    démarrage, CORS, erreurs
-    config/                     lecture et validation des variables d'environnement
-    routes/                     toutes les routes /api
-    services/                   logique métier (auth, rides, bookings)
-    middleware/                 authentification JWT, contrôle des rôles
-    utils/                      JWT, dates
-    types/                      types partagés
-    prisma.ts                   client de base de données
+    index.ts                    Démarrage du serveur
+    config/                     Configuration
+    routes/                     Routes de l'API
+    services/                   Logique de l'application
+    middleware/                 Connexion et rôles
+    utils/                      Fonctions utiles
 ```
 
 ---
 
-## 7. Organisation de l'équipe
+## 7. Organisation de notre travail
 
-<!-- À compléter par l'équipe. -->
-
-| Membre | Responsabilités |
+| Membre | Travail réalisé |
 |---|---|
-| [Prénom Nom] | [ex. pages de recherche et de détail, composants] |
-| [Prénom Nom] | [ex. authentification, tableau de bord] |
-| [Prénom Nom] | [ex. API Express, base de données Prisma] |
+| Mohamed Laabidi | Interface Angular, pages de recherche et de détail, composants et expérience utilisateur. |
+| Maled slema | Authentification, profil, tableau de bord, API et base de données. |
 
-- Une branche par fonctionnalité (`feat/...`, `fix/...`, `docs/...`), fusionnée par *pull request* après relecture par un autre membre.
-- Suivi des tâches : tableau GitHub Projects du dépôt (onglet **Projects**).
+Nous avons travaillé avec des branches Git séparées pour les nouvelles fonctionnalités et les corrections. Avant de réunir les changements, nous relisons le code et nous vérifions que le projet se lance correctement.
 
 ---
 
-## 8. Limites du prototype
+## 8. Ce qui reste à améliorer
 
-- **Le site n'est pas encore branché sur l'API.** Les pages utilisent une base simulée dans le navigateur (`client/src/app/services/`). `ApiService` et l'intercepteur de jeton sont prêts pour le branchement.
-- **Données de démonstration** : trajets, comptes et avis sont fictifs.
-- **Sécurité de la simulation** : dans le navigateur, les mots de passe sont stockés en clair et le « jeton » n'est pas un vrai JWT. Ne jamais y saisir un vrai mot de passe.
-- **API** : les requêtes ne sont pas encore validées champ par champ (seules les variables d'environnement le sont), pas de limitation du nombre de requêtes, pas de HTTPS en local.
-- **Pas de paiement, pas de messagerie** : le prix affiché est indicatif et le paiement se fait entre les personnes.
-- **Dates et heures** : stockées sous forme de texte (`AAAA-MM-JJ`, `HH:MM`) sans gestion des fuseaux horaires.
-- **Rôles** : l'API réserve la publication de trajets aux conducteurs, alors que le site simulé laisse tout compte connecté publier.
-- **Avis** : affichés mais pas encore saisis depuis le site.
+Fi thnity est encore un prototype. Voici ses limites actuelles :
+
+- le site utilise encore principalement une base simulée dans le navigateur ;
+- les données de démonstration sont fictives ;
+- dans le mode simulé, les mots de passe ne doivent pas être de vrais mots de passe ;
+- toutes les données envoyées à l'API ne sont pas encore vérifiées champ par champ ;
+- il n'y a pas encore de paiement ni de messagerie ;
+- les avis sont affichés, mais ne sont pas encore complètement enregistrés depuis le site ;
+- l'API et le site ne sont pas encore déployés en ligne.
 
 ---
 
-## 9. Évolutions possibles
+## 9. Nos prochaines idées
 
-- Brancher le site sur l'API (remplacer les services simulés par `ApiService`).
-- Valider les requêtes de l'API avec zod, ajouter des tests (Vitest pour le client et l'API, Playwright pour les parcours complets).
-- Laisser un avis après un trajet effectué, modifier ou annuler un trajet publié, prévenir les passagers.
-- Pagination et tri des résultats, recherche par ville avec suggestions.
-- Traduction de l'interface (arabe), réinitialisation du mot de passe par email.
-- Déploiement (hébergement du site statique, de l'API et de PostgreSQL).
+Nous aimerions continuer le projet avec les améliorations suivantes :
+
+- connecter complètement le site à l'API ;
+- ajouter des tests automatisés ;
+- permettre de laisser un avis après un trajet ;
+- permettre de modifier ou d'annuler un trajet publié ;
+- ajouter la pagination et une meilleure recherche par ville ;
+- ajouter une version arabe de l'interface ;
+- ajouter la récupération du mot de passe par email ;
+- mettre le site, l'API et la base de données en ligne.

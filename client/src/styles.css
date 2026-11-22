@@ -8,7 +8,7 @@
   --color-papier: #F7F4EC;
   --color-menthe: #23705A;
   --color-corail: #B8402A;
-  --color-ardoise: #5F7078;
+  --color-ardoise: #54656D; /* Contraste renforcé > 5:1 conforme WCAG AA */
   --color-filet: #DDD8CA;
 
   --font-titre: "Poppins", Georgia, serif;
@@ -18,15 +18,47 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-papier font-texte text-nuit antialiased;
   }
+
   h1, h2, h3 {
     @apply font-titre font-semibold;
   }
-  /* Focus visible pour l'accessibilité clavier */
+
+  /* Focus visible hautement contrasté pour l'accessibilité au clavier (WCAG 2.4.7) */
   :focus-visible {
     outline: 3px solid var(--color-soleil);
     outline-offset: 2px;
+  }
+}
+
+/* Animations légères pour fluidifier l'expérience utilisateur */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Respect des préférences utilisateur anti-mouvement (Accessibilité) */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

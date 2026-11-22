@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs';
 import { RideCardComponent } from '../components/ride-card.component';
 import { ButtonComponent } from '../components/ui/button.component';
+import { SkeletonComponent } from '../components/ui/skeleton.component';
 import { RidesService } from '../services/rides.service';
 import { inputValue } from '../utils/dom';
 
@@ -21,21 +22,33 @@ const FILTERS: Filter[] = [
 
 @Component({
   selector: 'app-rides',
-  imports: [RideCardComponent, ButtonComponent],
+  imports: [RideCardComponent, ButtonComponent, SkeletonComponent],
   host: { class: 'block' },
   template: `
     <section>
       <p class="text-xs font-bold uppercase tracking-widest text-corail">Recherche</p>
-      <h1 class="mt-1 text-3xl">Trouve ton trajet</h1>
+      <h1 class="mt-1 text-3xl font-titre font-bold">Trouve ton trajet</h1>
 
       <form (submit)="submit($event)" class="mt-6 grid gap-3 md:grid-cols-4">
-        <input class="min-h-11 rounded-charte border border-ardoise bg-white px-3" placeholder="Départ" aria-label="Départ" [value]="form().depart" (input)="setField('depart', inputValue($event))" />
-        <input class="min-h-11 rounded-charte border border-ardoise bg-white px-3" placeholder="Arrivée" aria-label="Arrivée" [value]="form().arrivee" (input)="setField('arrivee', inputValue($event))" />
-        <input type="date" class="min-h-11 rounded-charte border border-ardoise bg-white px-3" aria-label="Date" [value]="form().date" (input)="setField('date', inputValue($event))" />
+        <input list="villes-tunisie" class="min-h-11 rounded-charte border border-ardoise bg-white px-3 focus:border-soleil" placeholder="Départ (ex. Sfax)" aria-label="Ville de départ" [value]="form().depart" (input)="setField('depart', inputValue($event))" />
+        <input list="villes-tunisie" class="min-h-11 rounded-charte border border-ardoise bg-white px-3 focus:border-soleil" placeholder="Arrivée (ex. Tunis)" aria-label="Ville d'arrivée" [value]="form().arrivee" (input)="setField('arrivee', inputValue($event))" />
+        <input type="date" class="min-h-11 rounded-charte border border-ardoise bg-white px-3 focus:border-soleil" aria-label="Date" [value]="form().date" (input)="setField('date', inputValue($event))" />
         <button app-button type="submit" variant="accent">Rechercher</button>
+        <datalist id="villes-tunisie">
+          <option value="Tunis"></option>
+          <option value="Sfax"></option>
+          <option value="Sousse"></option>
+          <option value="Bizerte"></option>
+          <option value="Nabeul"></option>
+          <option value="Monastir"></option>
+          <option value="Kairouan"></option>
+          <option value="Gabès"></option>
+          <option value="Ariana"></option>
+          <option value="La Manouba"></option>
+        </datalist>
       </form>
 
-      <div class="mt-4 flex flex-wrap gap-2" role="group" aria-label="Filtres">
+      <div class="mt-4 flex flex-wrap gap-2" role="group" aria-label="Filtres rapides">
         @for (f of filters; track f.key) {
           <button type="button" [attr.aria-pressed]="isOn(f)" (click)="toggle(f.key, f.value)" [class]="filterClass(f)">
             {{ f.label }}
@@ -46,7 +59,18 @@ const FILTERS: Filter[] = [
       <div class="mt-6" aria-live="polite">
         @if (rides(); as list) {
           @if (list.length === 0) {
-            <p class="text-ardoise">Aucun trajet ne correspond. Essaie d'élargir ta recherche.</p>
+            <div class="mt-8 rounded-charte border border-filet bg-white p-8 text-center">
+              <span class="text-3xl">🚗</span>
+              <h2 class="mt-3 font-titre text-lg font-bold text-nuit">Aucun trajet ne correspond</h2>
+              <p class="mt-1 text-sm text-ardoise max-w-md mx-auto">
+                Aucun trajet ne répond exactement à tes critères. Essaie d'élargir ta date ou d'ajuster tes filtres de recherche.
+              </p>
+              <div class="mt-5 flex justify-center gap-3">
+                <button type="button" (click)="resetFilters()" class="text-sm font-semibold underline decoration-soleil decoration-2 underline-offset-4">
+                  Réinitialiser la recherche
+                </button>
+              </div>
+            </div>
           } @else {
             <p class="text-sm text-ardoise">{{ list.length }} trajet{{ list.length > 1 ? 's' : '' }} trouvé{{ list.length > 1 ? 's' : '' }}</p>
             <ul class="mt-2 border-t border-filet">
@@ -56,7 +80,25 @@ const FILTERS: Filter[] = [
             </ul>
           }
         } @else {
-          <p class="text-ardoise">Chargement…</p>
+          <!-- Skeleton Loading -->
+          <div class="mt-4 space-y-4" aria-label="Chargement des trajets">
+            @for (i of [1, 2, 3, 4]; track i) {
+              <div class="flex flex-col gap-3 rounded-charte border border-filet bg-white p-4 sm:flex-row sm:items-center">
+                <div class="space-y-2 sm:w-48">
+                  <app-skeleton width="120px" height="1.25rem" />
+                  <app-skeleton width="80px" height="0.875rem" />
+                </div>
+                <div class="flex-1 space-y-2">
+                  <app-skeleton width="220px" height="1.25rem" />
+                </div>
+                <div class="flex items-center gap-4">
+                  <app-skeleton width="70px" height="1rem" />
+                  <app-skeleton width="60px" height="1.25rem" />
+                  <app-skeleton width="45px" height="1.5rem" />
+                </div>
+              </div>
+            }
+          </div>
         }
       </div>
     </section>
@@ -78,6 +120,11 @@ export class RidesComponent {
     arrivee: this.route.snapshot.queryParamMap.get('arrivee') ?? '',
     date: this.route.snapshot.queryParamMap.get('date') ?? '',
   });
+
+  protected resetFilters(): void {
+    this.form.set({ depart: '', arrivee: '', date: '' });
+    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+  }
 
   /** Recharge les trajets à chaque changement d'URL (switchMap ignore les réponses obsolètes). */
   protected readonly rides = toSignal(

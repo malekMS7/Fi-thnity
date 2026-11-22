@@ -4,7 +4,9 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { RatingComponent } from '../components/rating.component';
 import { ButtonComponent } from '../components/ui/button.component';
+import { SkeletonComponent } from '../components/ui/skeleton.component';
 import { SessionService } from '../core/session.service';
+import { ToastService } from '../core/toast.service';
 import { BookingsService } from '../services/bookings.service';
 import { RidesService } from '../services/rides.service';
 import type { Review, Ride } from '../types';
@@ -18,80 +20,249 @@ interface Message {
 
 @Component({
   selector: 'app-ride-detail',
-  imports: [RouterLink, RatingComponent, ButtonComponent, FormatDatePipe, FormatPricePipe],
+  imports: [RouterLink, RatingComponent, ButtonComponent, SkeletonComponent, FormatDatePipe, FormatPricePipe],
   host: { class: 'block' },
   template: `
+    <!-- Bouton Retour -->
+    <div class="mb-6">
+      <a routerLink="/trajets" class="inline-flex items-center gap-1.5 text-sm font-semibold text-ardoise hover:text-nuit">
+        <span>←</span> Retour à la liste des trajets
+      </a>
+    </div>
+
     @if (ride(); as r) {
       <section class="grid gap-10 md:grid-cols-[1.3fr_1fr]">
-        <div>
-          <p class="text-xs font-bold uppercase tracking-widest text-corail">Trajet</p>
-          <h1 class="mt-1 text-3xl">{{ r.from }} → {{ r.to }}</h1>
-          <p class="mt-2 text-ardoise">{{ r.date | formatDate }} · départ {{ r.time }}</p>
+        <div class="rounded-charte border border-filet bg-white p-6 shadow-xs">
+          <span class="inline-block rounded-full bg-soleil/20 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-nuit">
+            Détails de l'itinéraire
+          </span>
+          <h1 class="mt-2 text-3xl font-titre font-bold text-nuit">{{ r.from }} → {{ r.to }}</h1>
+          <p class="mt-1 text-sm text-ardoise">{{ r.date | formatDate }} · Départ prévu à <b>{{ r.time }}</b></p>
 
           <dl class="mt-6 divide-y divide-filet border-y border-filet text-sm">
-            <div class="flex justify-between py-3"><dt>Point de rendez-vous</dt><dd class="font-semibold">{{ r.meetingPoint }}</dd></div>
-            <div class="flex justify-between py-3"><dt>Places restantes</dt><dd class="font-semibold">{{ r.seatsLeft }} sur {{ r.seats }}</dd></div>
-            <div class="flex justify-between py-3"><dt>Prix par place</dt><dd class="font-semibold text-menthe">{{ r.price | formatPrice }}</dd></div>
-            <div class="flex justify-between py-3"><dt>Options</dt><dd>{{ r.options.length ? r.options.join(' · ') : 'Aucune' }}</dd></div>
+            <div class="flex justify-between py-3.5">
+              <dt class="text-ardoise">Point de rendez-vous</dt>
+              <dd class="font-semibold text-nuit text-right">{{ r.meetingPoint }}</dd>
+            </div>
+            <div class="flex justify-between py-3.5">
+              <dt class="text-ardoise">Places restantes</dt>
+              <dd class="font-semibold text-nuit">
+                <span [class]="r.seatsLeft === 0 ? 'text-corail' : 'text-menthe'">
+                  {{ r.seatsLeft }}
+                </span>
+                sur {{ r.seats }} places offertes
+              </dd>
+            </div>
+            <div class="flex justify-between py-3.5">
+              <dt class="text-ardoise">Prix par place</dt>
+              <dd class="text-lg font-bold text-menthe">{{ r.price | formatPrice }}</dd>
+            </div>
+            <div class="flex justify-between py-3.5">
+              <dt class="text-ardoise">Options & Préférences</dt>
+              <dd class="font-medium text-nuit">
+                @if (r.options.length) {
+                  <span class="inline-flex flex-wrap gap-1.5 justify-end">
+                    @for (opt of r.options; track opt) {
+                      <span class="rounded-full bg-papier px-2.5 py-0.5 text-xs text-ardoise border border-filet">{{ opt }}</span>
+                    }
+                  </span>
+                } @else {
+                  <span class="text-ardoise">Aucune option particulière</span>
+                }
+              </dd>
+            </div>
           </dl>
 
-          <div class="mt-6 space-y-3">
+          <!-- Zone de réservation -->
+          <div class="mt-8 rounded-charte border border-filet bg-papier p-5">
+            <h2 class="font-titre text-base font-bold text-nuit">Réserver ce trajet</h2>
+
             @if (isOwner()) {
-              <p class="text-sm text-ardoise">C'est ton trajet. Retrouve les réservations dans ton <a routerLink="/tableau-de-bord" class="font-semibold underline decoration-soleil decoration-2">tableau de bord</a>.</p>
+              <p class="mt-2 text-sm text-ardoise">
+                Tu es le conducteur de ce trajet. Retrouve tes passagers et réservations dans ton
+                <a routerLink="/tableau-de-bord" class="font-semibold text-nuit underline decoration-soleil decoration-2">tableau de bord</a>.
+              </p>
             } @else if (full()) {
-              <p class="font-semibold text-corail">Complet : plus aucune place disponible.</p>
+              <div class="mt-2 rounded-charte border border-corail/30 bg-corail/10 p-3 text-sm font-semibold text-corail">
+                Ce trajet est complet : toutes les places ont été réservées.
+              </div>
             } @else {
-              <div class="flex flex-wrap items-center gap-3">
-                <label class="text-sm">Places<select
+              <div class="mt-4 flex flex-wrap items-center gap-4">
+                <label for="seats-select" class="text-sm font-medium">
+                  Nombre de places :
+                  <select
+                    id="seats-select"
                     (change)="setSeats($event)"
-                    class="ml-2 min-h-11 rounded-charte border border-ardoise bg-white px-2"
+                    class="ml-2 min-h-11 rounded-charte border border-ardoise bg-white px-3 font-semibold text-nuit focus:border-soleil"
                   >
                     @for (n of seatOptions(); track n) {
-                      <option [value]="n" [selected]="n === seats()">{{ n }}</option>
+                      <option [value]="n" [selected]="n === seats()">{{ n }} place{{ n > 1 ? 's' : '' }}</option>
                     }
-                  </select></label>
-                <button app-button variant="accent" type="button" (click)="reserve()">Réserver · {{ r.price * seats() | formatPrice }}</button>
+                  </select>
+                </label>
+
+                <button
+                  app-button
+                  variant="accent"
+                  type="button"
+                  (click)="reserve()"
+                  [disabled]="reserving()"
+                >
+                  {{ reserving() ? 'Validation…' : 'Réserver · ' + (r.price * seats() | formatPrice) }}
+                </button>
               </div>
+
+              @if (!session.user()) {
+                <p class="mt-3 text-xs text-ardoise">
+                  ℹ️ Une connexion ou inscription rapide te sera demandée pour finaliser la réservation.
+                </p>
+              }
             }
-            @if (!session.user() && !isOwner() && !full()) {
-              <p class="text-sm text-ardoise">Une connexion te sera demandée pour réserver.</p>
-            }
+
             @if (message(); as m) {
-              <p role="status" [class]="messageClass(m)">
-                {{ m.type === 'ok' ? '' : 'Error : ' }}{{ m.text }}
+              <div role="status" class="mt-4 rounded-charte p-3 text-sm font-medium" [class]="m.type === 'ok' ? 'bg-menthe/10 text-menthe border border-menthe/30' : 'bg-corail/10 text-corail border border-corail/30'">
+                {{ m.text }}
                 @if (m.type === 'ok') {
-                  <a routerLink="/tableau-de-bord" class="underline decoration-soleil decoration-2">Voir mes réservations</a>
+                  · <a routerLink="/tableau-de-bord" class="underline decoration-menthe font-semibold">Voir mes réservations</a>
                 }
-              </p>
+              </div>
             }
           </div>
         </div>
 
-        <aside>
-          <p class="text-xs font-bold uppercase tracking-widest text-corail">Conducteur</p>
-          <h2 class="mt-1 text-2xl">{{ r.driverName }}</h2>
-          <p class="mt-1"><app-rating [ride]="r" /></p>
-          <h3 class="mt-6 text-xs font-bold uppercase tracking-widest text-corail">Avis récents</h3>
-          @if (reviews().length === 0) {
-            <p class="mt-2 text-sm text-ardoise">Pas encore d'avis.</p>
-          }
-          <ul class="mt-2 divide-y divide-filet">
-            @for (rv of reviews().slice(0, 3); track rv.id) {
-              <li class="py-3">
-                <p class="font-titre">« {{ rv.comment }} »</p>
-                <p class="text-sm text-ardoise">{{ rv.authorName }} · ★ {{ rv.rating }}</p>
-              </li>
-            }
-          </ul>
+        <!-- Colonne Conducteur & Avis -->
+        <aside class="space-y-6">
+          <div class="rounded-charte border border-filet bg-white p-6 shadow-xs">
+            <p class="text-xs font-bold uppercase tracking-widest text-corail">Conducteur</p>
+            <div class="mt-3 flex items-center gap-3">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-nuit font-titre text-base font-bold text-soleil">
+                {{ r.driverName.charAt(0).toUpperCase() }}
+              </div>
+              <div>
+                <h3 class="text-xl font-titre font-bold text-nuit">{{ r.driverName }}</h3>
+                <p class="mt-0.5"><app-rating [ride]="r" /></p>
+              </div>
+            </div>
+
+            <div class="mt-6 border-t border-filet pt-4">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold uppercase tracking-widest text-corail">Avis des passagers ({{ reviews().length }})</h4>
+                @if (reviews().length > 3) {
+                  <button
+                    type="button"
+                    (click)="showAllReviews.set(!showAllReviews())"
+                    class="text-xs font-semibold text-nuit underline decoration-soleil decoration-2 underline-offset-4"
+                  >
+                    {{ showAllReviews() ? 'Réduire' : 'Voir tout (' + reviews().length + ')' }}
+                  </button>
+                }
+              </div>
+
+              @if (reviews().length === 0) {
+                <p class="mt-2 text-sm text-ardoise">Ce conducteur n'a pas encore reçu d'avis.</p>
+              } @else {
+                <ul class="mt-3 divide-y divide-filet">
+                  @for (rv of displayedReviews(); track rv.id) {
+                    <li class="py-3 text-sm">
+                      <p class="font-titre italic text-nuit">« {{ rv.comment }} »</p>
+                      <div class="mt-1 flex items-center justify-between text-xs text-ardoise">
+                        <span class="font-semibold">{{ rv.authorName }}</span>
+                        <span class="text-[#8A6410]">★ {{ rv.rating }} / 5</span>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              }
+
+              <!-- Formulaire interactif pour déposer un avis -->
+              @if (session.user(); as currentUser) {
+                @if (!isOwner()) {
+                  <div class="mt-6 rounded-charte border border-filet bg-papier p-4">
+                    <h5 class="font-titre text-xs font-bold uppercase tracking-wider text-nuit">Évaluer ce conducteur</h5>
+                    <form (submit)="submitReview($event, r.driverId, currentUser.name)" class="mt-3 space-y-3">
+                      <div>
+                        <div class="flex items-center gap-1">
+                          @for (star of [1, 2, 3, 4, 5]; track star) {
+                            <button
+                              type="button"
+                              (click)="newRating.set(star)"
+                              class="text-lg transition-transform hover:scale-125 focus:outline-hidden cursor-pointer"
+                              [class]="star <= newRating() ? 'text-[#8A6410]' : 'text-ardoise/30'"
+                              [attr.aria-label]="star + ' étoile' + (star > 1 ? 's' : '')"
+                            >
+                              ★
+                            </button>
+                          }
+                          <span class="ml-2 text-xs font-semibold text-nuit">{{ newRating() }}/5</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <textarea
+                          rows="2"
+                          [value]="newComment()"
+                          (input)="newComment.set(inputValue($event))"
+                          placeholder="Partage ton expérience : ponctualité, convivialité, propreté…"
+                          class="w-full rounded-charte border border-ardoise bg-white p-2 text-xs focus:border-soleil"
+                          required
+                        ></textarea>
+                      </div>
+
+                      <button
+                        app-button
+                        type="submit"
+                        variant="accent"
+                        class="w-full text-xs"
+                        [disabled]="submittingReview() || !newComment().trim()"
+                      >
+                        {{ submittingReview() ? 'Envoi en cours…' : 'Publier mon avis' }}
+                      </button>
+                    </form>
+                  </div>
+                }
+              } @else {
+                <div class="mt-4 rounded-charte border border-filet bg-papier p-3 text-xs text-ardoise">
+                  <a routerLink="/connexion" class="font-semibold text-nuit underline decoration-soleil decoration-2 underline-offset-4">
+                    Connecte-toi
+                  </a> pour laisser un avis sur ce conducteur.
+                </div>
+              }
+            </div>
+          </div>
         </aside>
       </section>
     } @else if (ride() === null) {
-      <section>
-        <h1 class="text-3xl">Trajet introuvable</h1>
-        <a routerLink="/trajets" class="mt-4 inline-block font-semibold underline decoration-soleil decoration-2">Retour à la recherche</a>
+      <section class="rounded-charte border border-filet bg-white p-10 text-center">
+        <h1 class="text-2xl font-titre font-bold text-nuit">Trajet introuvable</h1>
+        <p class="mt-2 text-sm text-ardoise">Ce trajet n'existe plus ou a été annulé par le conducteur.</p>
+        <a routerLink="/trajets" class="mt-5 inline-block text-sm font-semibold underline decoration-soleil decoration-2 underline-offset-4">
+          Retour à la liste des trajets
+        </a>
       </section>
     } @else {
-      <p class="text-ardoise">Chargement…</p>
+      <!-- Skeletons du détail de trajet -->
+      <section class="grid gap-10 md:grid-cols-[1.3fr_1fr]">
+        <div class="space-y-4 rounded-charte border border-filet bg-white p-6">
+          <app-skeleton width="100px" height="1.25rem" />
+          <app-skeleton width="280px" height="2rem" />
+          <app-skeleton width="180px" height="1rem" />
+          <div class="mt-6 space-y-3 pt-4 border-t border-filet">
+            <app-skeleton width="100%" height="2rem" />
+            <app-skeleton width="100%" height="2rem" />
+            <app-skeleton width="100%" height="2rem" />
+          </div>
+        </div>
+        <div class="space-y-4 rounded-charte border border-filet bg-white p-6">
+          <app-skeleton width="80px" height="1.25rem" />
+          <div class="flex items-center gap-3">
+            <app-skeleton width="48px" height="48px" rounded="rounded-full" />
+            <div class="space-y-2">
+              <app-skeleton width="120px" height="1.25rem" />
+              <app-skeleton width="90px" height="1rem" />
+            </div>
+          </div>
+        </div>
+      </section>
     }
   `,
 })
@@ -100,6 +271,7 @@ export class RideDetailComponent {
   private readonly router = inject(Router);
   private readonly ridesService = inject(RidesService);
   private readonly bookingsService = inject(BookingsService);
+  private readonly toastService = inject(ToastService);
   protected readonly session = inject(SessionService);
 
   private readonly id = signal<string | null>(null);
@@ -108,6 +280,18 @@ export class RideDetailComponent {
   protected readonly reviews = signal<Review[]>([]);
   protected readonly seats = signal(1);
   protected readonly message = signal<Message | null>(null);
+  protected readonly reserving = signal(false);
+
+  protected readonly newRating = signal(5);
+  protected readonly newComment = signal('');
+  protected readonly submittingReview = signal(false);
+  protected readonly showAllReviews = signal(false);
+  protected readonly inputValue = inputValue;
+
+  protected readonly displayedReviews = computed(() => {
+    const all = this.reviews();
+    return this.showAllReviews() ? all : all.slice(0, 3);
+  });
 
   protected readonly isOwner = computed(() => {
     const r = this.ride();
@@ -119,7 +303,6 @@ export class RideDetailComponent {
   );
 
   constructor() {
-    // Recharge le trajet quand l'identifiant dans l'URL change (/trajets/:id).
     this.route.paramMap
       .pipe(map((p) => p.get('id')), takeUntilDestroyed())
       .subscribe((id) => {
@@ -139,10 +322,6 @@ export class RideDetailComponent {
     this.seats.set(Number(inputValue(e)));
   }
 
-  protected messageClass(m: Message): string {
-    return `text-sm font-semibold ${m.type === 'ok' ? 'text-menthe' : 'text-corail'}`;
-  }
-
   protected async reserve(): Promise<void> {
     const r = this.ride();
     if (!r) return;
@@ -151,13 +330,41 @@ export class RideDetailComponent {
       await this.router.navigate(['/connexion'], { state: { from: this.router.url } });
       return;
     }
+
+    this.reserving.set(true);
+    this.message.set(null);
+
     try {
       await this.bookingsService.createBooking(r.id, user, this.seats());
-      this.message.set({ type: 'ok', text: 'Réservation confirmée !' });
+      this.message.set({ type: 'ok', text: 'Réservation confirmée avec succès !' });
+      this.toastService.show(`Ta réservation pour ${r.from} → ${r.to} est confirmée !`, 'success');
       this.seats.set(1);
       await this.load();
     } catch (err) {
-      this.message.set({ type: 'error', text: err instanceof Error ? err.message : 'Réservation impossible.' });
+      const errMsg = err instanceof Error ? err.message : 'Réservation impossible.';
+      this.message.set({ type: 'error', text: errMsg });
+      this.toastService.show(errMsg, 'error');
+    } finally {
+      this.reserving.set(false);
+    }
+  }
+
+  protected async submitReview(e: Event, driverId: string, authorName: string): Promise<void> {
+    e.preventDefault();
+    const comment = this.newComment().trim();
+    if (!comment) return;
+
+    this.submittingReview.set(true);
+    try {
+      await this.ridesService.createReview(driverId, authorName, this.newRating(), comment);
+      this.toastService.show('Ton avis a été publié avec succès !', 'success');
+      this.newComment.set('');
+      this.newRating.set(5);
+      await this.load();
+    } catch (err) {
+      this.toastService.show(err instanceof Error ? err.message : 'Impossible d\'enregistrer l\'avis.', 'error');
+    } finally {
+      this.submittingReview.set(false);
     }
   }
 }

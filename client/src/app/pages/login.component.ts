@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ButtonComponent } from '../components/ui/button.component';
 import { FieldComponent } from '../components/ui/field.component';
 import { SessionService } from '../core/session.service';
+import { ToastService } from '../core/toast.service';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -14,8 +15,8 @@ import { AuthService } from '../services/auth.service';
       <p class="text-xs font-bold uppercase tracking-widest text-corail">Connexion</p>
       <h1 class="mt-1 text-3xl">Content de te revoir.</h1>
       <form (submit)="handleSubmit($event)" class="mt-6 space-y-4">
-        <app-field label="Email" type="email" [value]="email()" (valueChange)="email.set($event)" required />
-        <app-field label="Mot de passe" type="password" [value]="password()" (valueChange)="password.set($event)" required />
+        <app-field label="Email" type="email" [value]="email()" (valueChange)="email.set($event)" autocomplete="email" required />
+        <app-field label="Mot de passe" type="password" [value]="password()" (valueChange)="password.set($event)" autocomplete="current-password" required />
         @if (error()) {
           <p role="alert" class="text-sm text-corail">Error : {{ error() }}</p>
         }
@@ -33,6 +34,7 @@ import { AuthService } from '../services/auth.service';
 export class LoginComponent {
   private readonly session = inject(SessionService);
   private readonly authService = inject(AuthService);
+  private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
 
   /** Page d'origine transmise par authGuard (ou par « Réserver » sans être connecté). */
@@ -48,6 +50,7 @@ export class LoginComponent {
     try {
       const { token, user } = await this.authService.login(this.email(), this.password());
       this.session.login(token, user);
+      this.toastService.show(`Ravi de te revoir, ${user.name} !`, 'success');
       await this.router.navigateByUrl(this.from, { replaceUrl: true });
     } catch (err) {
       this.error.set(err instanceof Error ? err.message : 'Connexion impossible.');

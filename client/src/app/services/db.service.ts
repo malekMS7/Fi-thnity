@@ -11,6 +11,7 @@ export interface StoredUser {
   name: string;
   email: string;
   phone?: string;
+  bio?: string;
   role: Role;
   password: string; // en clair : uniquement pour la simulation !
 }

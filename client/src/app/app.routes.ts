@@ -1,32 +1,61 @@
 import type { Routes } from '@angular/router';
 import { LayoutComponent } from './components/layout/layout.component';
 import { authGuard } from './core/auth.guard';
-import { DashboardComponent } from './pages/dashboard.component';
-import { HomeComponent } from './pages/home.component';
-import { LoginComponent } from './pages/login.component';
-import { NotFoundComponent } from './pages/not-found.component';
-import { PublishRideComponent } from './pages/publish-ride.component';
-import { RegisterComponent } from './pages/register.component';
-import { RideDetailComponent } from './pages/ride-detail.component';
-import { RidesComponent } from './pages/rides.component';
 
 export const routes: Routes = [
   {
     path: '',
     component: LayoutComponent,
     children: [
-      // Pages publiques
-      { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'connexion', component: LoginComponent },
-      { path: 'inscription', component: RegisterComponent },
-      { path: 'trajets', component: RidesComponent },
-      { path: 'trajets/:id', component: RideDetailComponent },
+      // Pages publiques en Lazy Loading (Code Splitting)
+      {
+        path: '',
+        loadComponent: () => import('./pages/home.component').then((m) => m.HomeComponent),
+        pathMatch: 'full',
+      },
+      {
+        path: 'connexion',
+        loadComponent: () => import('./pages/login.component').then((m) => m.LoginComponent),
+      },
+      {
+        path: 'inscription',
+        loadComponent: () => import('./pages/register.component').then((m) => m.RegisterComponent),
+      },
+      {
+        path: 'trajets',
+        loadComponent: () => import('./pages/rides.component').then((m) => m.RidesComponent),
+      },
+      {
+        path: 'trajets/:id',
+        loadComponent: () => import('./pages/ride-detail.component').then((m) => m.RideDetailComponent),
+      },
+      {
+        path: 'contact',
+        loadComponent: () => import('./pages/contact.component').then((m) => m.ContactComponent),
+      },
 
-      // Pages qui demandent un compte
-      { path: 'publier', component: PublishRideComponent, canActivate: [authGuard] },
-      { path: 'tableau-de-bord', component: DashboardComponent, canActivate: [authGuard] },
+      // Pages réservées aux utilisateurs connectés
+      {
+        path: 'publier',
+        loadComponent: () => import('./pages/publish-ride.component').then((m) => m.PublishRideComponent),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'tableau-de-bord',
+        loadComponent: () => import('./pages/dashboard.component').then((m) => m.DashboardComponent),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'profil',
+        loadComponent: () => import('./pages/profile.component').then((m) => m.ProfileComponent),
+        canActivate: [authGuard],
+      },
 
-      { path: '**', component: NotFoundComponent },
+      // Page 404 (Introuvable)
+      {
+        path: '**',
+        loadComponent: () => import('./pages/not-found.component').then((m) => m.NotFoundComponent),
+      },
     ],
   },
 ];

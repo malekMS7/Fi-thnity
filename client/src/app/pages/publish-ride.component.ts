@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ButtonComponent } from '../components/ui/button.component';
 import { FieldComponent } from '../components/ui/field.component';
 import { SessionService } from '../core/session.service';
+import { ToastService } from '../core/toast.service';
 import { RidesService } from '../services/rides.service';
 import { isPast, todayISO } from '../utils/format';
 
@@ -27,8 +28,8 @@ type Errors = Partial<Record<keyof PublishForm | 'form', string>>;
       <p class="text-xs font-bold uppercase tracking-widest text-corail">Publier un trajet</p>
       <h1 class="mt-1 text-3xl">Où vas-tu ?</h1>
       <form (submit)="handleSubmit($event)" novalidate class="mt-6 grid gap-x-8 gap-y-4 md:grid-cols-2">
-        <app-field label="Départ" [value]="f().from" (valueChange)="set('from', $event)" [error]="errors().from" />
-        <app-field label="Arrivée" [value]="f().to" (valueChange)="set('to', $event)" [error]="errors().to" />
+        <app-field label="Départ" list="villes-tunisie" [value]="f().from" (valueChange)="set('from', $event)" [error]="errors().from" />
+        <app-field label="Arrivée" list="villes-tunisie" [value]="f().to" (valueChange)="set('to', $event)" [error]="errors().to" />
         <app-field label="Date" type="date" [min]="today()" [value]="f().date" (valueChange)="set('date', $event)" [error]="errors().date" />
         <app-field label="Heure" type="time" [value]="f().time" (valueChange)="set('time', $event)" [error]="errors().time" />
         <app-field label="Places disponibles" type="number" [min]="1" [max]="8" [value]="f().seats" (valueChange)="set('seats', $event)" [error]="errors().seats" />
@@ -36,6 +37,18 @@ type Errors = Partial<Record<keyof PublishForm | 'form', string>>;
         <div class="md:col-span-2">
           <app-field label="Point de rendez-vous" [value]="f().meetingPoint" (valueChange)="set('meetingPoint', $event)" [error]="errors().meetingPoint" />
         </div>
+        <datalist id="villes-tunisie">
+          <option value="Tunis"></option>
+          <option value="Sfax"></option>
+          <option value="Sousse"></option>
+          <option value="Bizerte"></option>
+          <option value="Nabeul"></option>
+          <option value="Monastir"></option>
+          <option value="Kairouan"></option>
+          <option value="Gabès"></option>
+          <option value="Ariana"></option>
+          <option value="La Manouba"></option>
+        </datalist>
         <fieldset class="md:col-span-2">
           <legend class="text-sm font-medium">Options</legend>
           <div class="mt-1 flex flex-wrap gap-6 text-sm">
@@ -58,6 +71,7 @@ export class PublishRideComponent {
   private readonly session = inject(SessionService);
   private readonly router = inject(Router);
   private readonly ridesService = inject(RidesService);
+  private readonly toastService = inject(ToastService);
 
   protected readonly allOptions = ['Petit bagage', 'Non-fumeur', 'Musique'];
   protected readonly today = todayISO;
@@ -104,6 +118,7 @@ export class PublishRideComponent {
         },
         user,
       );
+      this.toastService.show('Ton trajet a été publié avec succès !', 'success');
       await this.router.navigate(['/trajets', ride.id]);
     } catch {
       this.errors.set({ form: 'publication impossible, réessaie.' });

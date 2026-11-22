@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ButtonComponent } from '../components/ui/button.component';
 import { FieldComponent } from '../components/ui/field.component';
 import { SessionService } from '../core/session.service';
+import { ToastService } from '../core/toast.service';
 import { AuthService } from '../services/auth.service';
 import type { Role } from '../types';
 
@@ -48,6 +49,7 @@ interface RegisterForm {
 export class RegisterComponent {
   private readonly session = inject(SessionService);
   private readonly authService = inject(AuthService);
+  private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
 
   protected readonly form = signal<RegisterForm>({ name: '', email: '', phone: '', password: '', role: 'PASSENGER' });
@@ -79,6 +81,7 @@ export class RegisterComponent {
     try {
       const { token, user } = await this.authService.register(this.form());
       this.session.login(token, user);
+      this.toastService.show(`Bienvenue sur Fi thnity, ${user.name} !`, 'success');
       await this.router.navigateByUrl('/tableau-de-bord');
     } catch (err) {
       this.errors.set({ form: err instanceof Error ? err.message : 'Inscription impossible.' });

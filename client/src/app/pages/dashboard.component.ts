@@ -1,6 +1,9 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ModalComponent } from '../components/ui/modal.component';
+import { SkeletonComponent } from '../components/ui/skeleton.component';
 import { SessionService } from '../core/session.service';
+import { ToastService } from '../core/toast.service';
 import { BookingsService } from '../services/bookings.service';
 import { RidesService } from '../services/rides.service';
 import type { BookingStatus, BookingWithRide, Ride } from '../types';
@@ -14,63 +17,158 @@ const STATUS: Record<BookingStatus, { label: string; cls: string }> = {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, FormatDatePipe, FormatPricePipe],
+  imports: [RouterLink, ModalComponent, SkeletonComponent, FormatDatePipe, FormatPricePipe],
   host: { class: 'block' },
   template: `
     @if (session.user(); as user) {
       <section>
-        <p class="text-xs font-bold uppercase tracking-widest text-corail">Tableau de bord</p>
-        <h1 class="mt-1 text-3xl">Bonjour {{ firstName() }}.</h1>
+        <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-widest text-corail">Tableau de bord</p>
+            <h1 class="mt-1 text-3xl font-titre font-bold text-nuit">Bonjour {{ firstName() }}.</h1>
+            <p class="mt-1 text-sm text-ardoise">Suis tes réservations et tes trajets publiés en un coup d'œil.</p>
+          </div>
+          <div class="flex gap-3">
+            <a routerLink="/profil" class="inline-flex min-h-11 items-center rounded-charte border border-nuit px-4 text-xs font-semibold uppercase tracking-wider text-nuit hover:bg-nuit/5">
+              Mon Profil
+            </a>
+            <a routerLink="/publier" class="inline-flex min-h-11 items-center rounded-charte bg-nuit px-4 text-xs font-semibold uppercase tracking-wider text-papier hover:bg-nuit/90">
+              + Publier un trajet
+            </a>
+          </div>
+        </div>
 
-        <dl class="mt-6 flex flex-wrap gap-x-16 gap-y-4">
-          <div><dd class="font-titre text-4xl font-bold text-corail">{{ upcoming().length }}</dd><dt class="text-sm text-ardoise">réservations à venir</dt></div>
-          <div><dd class="font-titre text-4xl font-bold">{{ rides().length }}</dd><dt class="text-sm text-ardoise">trajets publiés</dt></div>
-          <div><dd class="font-titre text-4xl font-bold">{{ passengers() }}</dd><dt class="text-sm text-ardoise">passagers sur mes trajets</dt></div>
+        <dl class="mt-8 flex flex-wrap gap-x-16 gap-y-4 rounded-charte border border-filet bg-white p-6 shadow-xs">
+          <div><dd class="font-titre text-4xl font-bold text-corail">{{ upcoming().length }}</dd><dt class="text-xs font-bold uppercase tracking-wider text-ardoise mt-1">réservations à venir</dt></div>
+          <div><dd class="font-titre text-4xl font-bold text-nuit">{{ rides().length }}</dd><dt class="text-xs font-bold uppercase tracking-wider text-ardoise mt-1">trajets publiés</dt></div>
+          <div><dd class="font-titre text-4xl font-bold text-menthe">{{ passengers() }}</dd><dt class="text-xs font-bold uppercase tracking-wider text-ardoise mt-1">passagers transportés</dt></div>
         </dl>
 
         <div class="mt-10 grid gap-10 md:grid-cols-2">
-          <div>
-            <h2 class="text-xs font-bold uppercase tracking-widest text-corail">Mes réservations</h2>
+          <!-- Colonne 1: Mes réservations -->
+          <div class="rounded-charte border border-filet bg-white p-6 shadow-xs">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xs font-bold uppercase tracking-widest text-corail">Mes réservations</h2>
+              <a routerLink="/trajets" class="text-xs font-semibold underline decoration-soleil decoration-2 underline-offset-4">
+                Trouver un trajet
+              </a>
+            </div>
+
             @if (bookings() === null) {
-              <p class="mt-3 text-ardoise">Chargement…</p>
+              <div class="mt-4 space-y-3" aria-label="Chargement de mes réservations">
+                <app-skeleton width="100%" height="3rem" />
+                <app-skeleton width="100%" height="3rem" />
+              </div>
+            } @else if (bookings()?.length === 0) {
+              <div class="mt-4 rounded-charte border border-dashed border-filet p-6 text-center">
+                <p class="text-sm text-ardoise">Tu n'as aucune réservation active.</p>
+                <a routerLink="/trajets" class="mt-2 inline-block font-semibold text-nuit underline decoration-soleil decoration-2">
+                  Découvrir les trajets disponibles →
+                </a>
+              </div>
+            } @else {
+              <ul class="mt-3 divide-y divide-filet border-y border-filet">
+                @for (b of bookingList(); track b.id) {
+                  <li class="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 text-sm">
+                    <div class="flex-1">
+                      <a [routerLink]="['/trajets', b.ride.id]" class="font-titre text-base font-semibold hover:text-menthe">
+                        {{ b.ride.from }} → {{ b.ride.to }}
+                      </a>
+                      <p class="text-xs text-ardoise">
+                        {{ b.ride.date | formatDate }} · {{ b.ride.time }} · {{ b.seats }} place{{ b.seats > 1 ? 's' : '' }} · {{ b.ride.price * b.seats | formatPrice }}
+                      </p>
+                    </div>
+                    <span [class]="'text-xs font-semibold uppercase tracking-wider ' + status[b.status].cls">
+                      {{ status[b.status].label }}
+                    </span>
+                    @if (canCancel(b)) {
+                      <button
+                        type="button"
+                        (click)="askCancel(b)"
+                        class="min-h-11 text-xs font-semibold text-corail underline decoration-corail underline-offset-4"
+                      >
+                        Annuler
+                      </button>
+                    }
+                  </li>
+                }
+              </ul>
             }
-            @if (bookings()?.length === 0) {
-              <p class="mt-3 text-sm text-ardoise">Aucune réservation. <a routerLink="/trajets" class="font-semibold text-nuit underline decoration-soleil decoration-2">Trouver un trajet</a></p>
-            }
-            <ul class="mt-2 divide-y divide-filet border-y border-filet">
-              @for (b of bookingList(); track b.id) {
-                <li class="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 text-sm">
-                  <div class="flex-1">
-                    <a [routerLink]="['/trajets', b.ride.id]" class="font-titre text-base font-semibold">{{ b.ride.from }} → {{ b.ride.to }}</a>
-                    <p class="text-ardoise">{{ b.ride.date | formatDate }} · {{ b.ride.time }} · {{ b.seats }} place{{ b.seats > 1 ? 's' : '' }} · {{ b.ride.price * b.seats | formatPrice }}</p>
-                  </div>
-                  <span [class]="'font-semibold ' + status[b.status].cls">{{ status[b.status].label }}</span>
-                  @if (canCancel(b)) {
-                    <button type="button" (click)="cancel(b.id, user.id)" class="min-h-11 text-sm font-medium underline decoration-corail decoration-2 underline-offset-4">Annuler</button>
-                  }
-                </li>
-              }
-            </ul>
           </div>
 
-          <div>
-            <h2 class="text-xs font-bold uppercase tracking-widest text-corail">Mes trajets publiés</h2>
+          <!-- Colonne 2: Mes trajets publiés -->
+          <div class="rounded-charte border border-filet bg-white p-6 shadow-xs">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xs font-bold uppercase tracking-widest text-corail">Mes trajets publiés</h2>
+              <a routerLink="/publier" class="text-xs font-semibold underline decoration-soleil decoration-2 underline-offset-4">
+                Proposer un trajet
+              </a>
+            </div>
+
             @if (rides().length === 0) {
-              <p class="mt-3 text-sm text-ardoise">Aucun trajet publié. <a routerLink="/publier" class="font-semibold text-nuit underline decoration-soleil decoration-2">Publier un trajet</a></p>
+              <div class="mt-4 rounded-charte border border-dashed border-filet p-6 text-center">
+                <p class="text-sm text-ardoise">Tu n'as publié aucun trajet en tant que conducteur.</p>
+                <a routerLink="/publier" class="mt-2 inline-block font-semibold text-nuit underline decoration-soleil decoration-2">
+                  Publier mon premier trajet →
+                </a>
+              </div>
+            } @else {
+              <ul class="mt-3 divide-y divide-filet border-y border-filet">
+                @for (r of rides(); track r.id) {
+                  <li class="flex flex-wrap items-center gap-4 py-3 text-sm">
+                    <div class="flex-1 min-w-[140px]">
+                      <a [routerLink]="['/trajets', r.id]" class="font-titre text-base font-semibold hover:text-menthe">
+                        {{ r.from }} → {{ r.to }}
+                      </a>
+                      <p class="text-xs text-ardoise">{{ r.date | formatDate }} · Départ à {{ r.time }}</p>
+                    </div>
+                    <span class="rounded-full bg-papier px-2.5 py-1 text-xs font-semibold text-ardoise border border-filet">
+                      {{ r.seats - r.seatsLeft }}/{{ r.seats }} places
+                    </span>
+                    @if (canCancelRide(r)) {
+                      <button
+                        type="button"
+                        (click)="askCancelRide(r)"
+                        class="min-h-11 text-xs font-semibold text-corail underline decoration-corail underline-offset-4"
+                      >
+                        Annuler
+                      </button>
+                    }
+                  </li>
+                }
+              </ul>
             }
-            <ul class="mt-2 divide-y divide-filet border-y border-filet">
-              @for (r of rides(); track r.id) {
-                <li class="flex items-center gap-4 py-3 text-sm">
-                  <div class="flex-1">
-                    <a [routerLink]="['/trajets', r.id]" class="font-titre text-base font-semibold">{{ r.from }} → {{ r.to }}</a>
-                    <p class="text-ardoise">{{ r.date | formatDate }} · {{ r.time }}</p>
-                  </div>
-                  <span class="text-ardoise">{{ r.seats - r.seatsLeft }}/{{ r.seats }} places</span>
-                </li>
-              }
-            </ul>
           </div>
         </div>
+
+        <!-- Modale de confirmation d'annulation -->
+        <app-modal
+          [isOpen]="modalOpen()"
+          [title]="modalTitle()"
+          [confirmText]="modalConfirmText()"
+          cancelText="Retour"
+          confirmVariant="secondary"
+          (confirm)="confirmAction()"
+          (cancel)="closeModal()"
+        >
+          @if (modalType() === 'booking' && selectedBooking(); as sb) {
+            <p>
+              Es-tu certain de vouloir annuler ta réservation pour le trajet
+              <b>{{ sb.ride.from }} → {{ sb.ride.to }}</b> du <b>{{ sb.ride.date | formatDate }}</b> à <b>{{ sb.ride.time }}</b> ?
+            </p>
+            <p class="mt-2 text-xs text-ardoise">
+              Tes {{ sb.seats }} place{{ sb.seats > 1 ? 's' : '' }} seront immédiatement remises à la disposition d'autres passagers.
+            </p>
+          } @else if (modalType() === 'ride' && selectedRide(); as sr) {
+            <p>
+              Es-tu certain de vouloir annuler ton trajet publié
+              <b>{{ sr.from }} → {{ sr.to }}</b> du <b>{{ sr.date | formatDate }}</b> à <b>{{ sr.time }}</b> ?
+            </p>
+            <p class="mt-2 text-xs text-corail">
+              Cette action supprimera définitivement le trajet et annulera les réservations éventuelles de tes passagers.
+            </p>
+          }
+        </app-modal>
       </section>
     }
   `,
@@ -79,12 +177,25 @@ export class DashboardComponent implements OnInit {
   protected readonly session = inject(SessionService);
   private readonly bookingsService = inject(BookingsService);
   private readonly ridesService = inject(RidesService);
+  private readonly toastService = inject(ToastService);
 
   protected readonly status = STATUS;
 
   /** null = chargement en cours. */
   protected readonly bookings = signal<BookingWithRide[] | null>(null);
   protected readonly rides = signal<Ride[]>([]);
+
+  protected readonly modalOpen = signal(false);
+  protected readonly modalType = signal<'booking' | 'ride'>('booking');
+  protected readonly selectedBooking = signal<BookingWithRide | null>(null);
+  protected readonly selectedRide = signal<Ride | null>(null);
+
+  protected readonly modalTitle = computed(() =>
+    this.modalType() === 'booking' ? 'Annuler ma réservation' : 'Supprimer mon trajet',
+  );
+  protected readonly modalConfirmText = computed(() =>
+    this.modalType() === 'booking' ? 'Confirmer l\'annulation' : 'Supprimer définitivement',
+  );
 
   protected readonly bookingList = computed(() => this.bookings() ?? []);
   protected readonly upcoming = computed(() => this.bookingList().filter((b) => this.canCancel(b)));
@@ -100,6 +211,10 @@ export class DashboardComponent implements OnInit {
     return b.status === 'CONFIRMED' && !isPast(b.ride.date, b.ride.time);
   }
 
+  protected canCancelRide(r: Ride): boolean {
+    return !isPast(r.date, r.time);
+  }
+
   private async load(): Promise<void> {
     const user = this.session.user();
     if (!user) return;
@@ -107,9 +222,50 @@ export class DashboardComponent implements OnInit {
     this.rides.set(await this.ridesService.listMyRides(user.id));
   }
 
-  protected async cancel(bookingId: string, userId: string): Promise<void> {
-    if (!window.confirm('Annuler cette réservation ?')) return;
-    await this.bookingsService.cancelBooking(bookingId, userId);
-    await this.load();
+  protected askCancel(booking: BookingWithRide): void {
+    this.selectedBooking.set(booking);
+    this.modalType.set('booking');
+    this.modalOpen.set(true);
+  }
+
+  protected askCancelRide(ride: Ride): void {
+    this.selectedRide.set(ride);
+    this.modalType.set('ride');
+    this.modalOpen.set(true);
+  }
+
+  protected closeModal(): void {
+    this.modalOpen.set(false);
+    this.selectedBooking.set(null);
+    this.selectedRide.set(null);
+  }
+
+  protected async confirmAction(): Promise<void> {
+    const user = this.session.user();
+    if (!user) return;
+
+    if (this.modalType() === 'booking') {
+      const sb = this.selectedBooking();
+      if (!sb) return;
+      try {
+        await this.bookingsService.cancelBooking(sb.id, user.id);
+        this.toastService.show(`Réservation pour ${sb.ride.from} → ${sb.ride.to} annulée.`, 'info');
+        this.closeModal();
+        await this.load();
+      } catch (err) {
+        this.toastService.show(err instanceof Error ? err.message : 'Erreur lors de l\'annulation.', 'error');
+      }
+    } else {
+      const sr = this.selectedRide();
+      if (!sr) return;
+      try {
+        await this.ridesService.cancelRide(sr.id, user.id);
+        this.toastService.show(`Trajet ${sr.from} → ${sr.to} supprimé avec succès.`, 'info');
+        this.closeModal();
+        await this.load();
+      } catch (err) {
+        this.toastService.show(err instanceof Error ? err.message : 'Erreur lors de la suppression.', 'error');
+      }
+    }
   }
 }

@@ -14,7 +14,7 @@ const STYLES: Record<Variant, string> = {
  * Les classes ajoutées sur la balise (ex. class="w-full") sont conservées.
  */
 @Component({
-  selector: 'button[app-button]',
+  selector: 'button[app-button], a[app-button]',
   host: { '[class]': 'classes()' },
   template: '<ng-content />',
 })
@@ -22,6 +22,6 @@ export class ButtonComponent {
   readonly variant = input<Variant>('primary');
 
   protected readonly classes = computed(
-    () => `min-h-11 rounded-charte px-4 text-sm font-semibold transition disabled:opacity-50 ${STYLES[this.variant()]}`,
+    () => `inline-flex items-center justify-center min-h-11 rounded-charte px-4 text-sm font-semibold transition disabled:opacity-50 ${STYLES[this.variant()]}`,
   );
 }
