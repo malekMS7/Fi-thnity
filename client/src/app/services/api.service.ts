@@ -2,6 +2,7 @@ import { firstValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { environment } from '../../environments/environment';
+import type { Booking, BookingWithRide, NewRideInput, Review, Ride, RideFilters, Role, User } from '../types';
 
 type Params = Record<string, string | number | boolean>;
 
@@ -15,31 +16,31 @@ export class ApiService {
   private readonly base = environment.apiUrl;
 
   readonly auth = {
-    register: async (input: { name: string; email: string; phone?: string; password: string; role: 'DRIVER' | 'PASSENGER' }) =>
-      firstValueFrom(this.http.post<{ token: string; user: any }>(`${this.base}/auth/register`, input)),
-    login: async (email: string, password: string) =>
-      firstValueFrom(this.http.post<{ token: string; user: any }>(`${this.base}/auth/login`, { email, password })),
+    register: (input: { name: string; email: string; phone?: string; password: string; role: Role }) =>
+      firstValueFrom(this.http.post<{ token: string; user: User }>(`${this.base}/auth/register`, input)),
+    login: (email: string, password: string) =>
+      firstValueFrom(this.http.post<{ token: string; user: User }>(`${this.base}/auth/login`, { email, password })),
   };
 
   readonly rides = {
-    list: async (filters: Params = {}) =>
-      firstValueFrom(this.http.get<any[]>(`${this.base}/rides`, { params: filters })),
-    get: async (id: string) =>
-      firstValueFrom(this.http.get<any>(`${this.base}/rides/${id}`)),
-    create: async (input: Record<string, unknown>) =>
-      firstValueFrom(this.http.post<any>(`${this.base}/rides`, input)),
-    mine: async () =>
-      firstValueFrom(this.http.get<any[]>(`${this.base}/rides/mine`)),
-    reviews: async (driverId: string) =>
-      firstValueFrom(this.http.get<any[]>(`${this.base}/rides/${driverId}/reviews`)),
+    list: (filters: Params = {}) =>
+      firstValueFrom(this.http.get<Ride[]>(`${this.base}/rides`, { params: filters })),
+    get: (id: string) =>
+      firstValueFrom(this.http.get<Ride>(`${this.base}/rides/${id}`)),
+    create: (input: NewRideInput) =>
+      firstValueFrom(this.http.post<Ride>(`${this.base}/rides`, input)),
+    mine: () =>
+      firstValueFrom(this.http.get<Ride[]>(`${this.base}/rides/mine`)),
+    reviews: (driverId: string) =>
+      firstValueFrom(this.http.get<Review[]>(`${this.base}/reviews/${driverId}`)),
   };
 
   readonly bookings = {
-    create: async (rideId: string, seats: number) =>
-      firstValueFrom(this.http.post<any>(`${this.base}/bookings`, { rideId, seats })),
-    mine: async () =>
-      firstValueFrom(this.http.get<any[]>(`${this.base}/bookings/mine`)),
-    cancel: async (id: string) =>
-      firstValueFrom(this.http.delete<any>(`${this.base}/bookings/${id}`)),
+    create: (rideId: string, seats: number) =>
+      firstValueFrom(this.http.post<Booking>(`${this.base}/bookings`, { rideId, seats })),
+    mine: () =>
+      firstValueFrom(this.http.get<BookingWithRide[]>(`${this.base}/bookings/mine`)),
+    cancel: (id: string) =>
+      firstValueFrom(this.http.delete<void>(`${this.base}/bookings/${id}`)),
   };
 }
