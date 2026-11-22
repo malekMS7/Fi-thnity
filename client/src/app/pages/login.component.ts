@@ -11,9 +11,9 @@ import { AuthService } from '../services/auth.service';
   imports: [RouterLink, ButtonComponent, FieldComponent],
   host: { class: 'block' },
   template: `
-    <section class="mx-auto max-w-md">
+    <section class="mx-auto max-w-md rounded-3xl border border-filet/80 bg-white p-8 shadow-sm">
       <p class="text-xs font-bold uppercase tracking-widest text-corail">Connexion</p>
-      <h1 class="mt-1 text-3xl">Content de te revoir.</h1>
+      <h1 class="mt-1 text-3xl font-titre font-bold text-nuit">Content de te revoir.</h1>
       <form (submit)="handleSubmit($event)" class="mt-6 space-y-4">
         <app-field label="Email" type="email" [value]="email()" (valueChange)="email.set($event)" autocomplete="email" required />
         <app-field label="Mot de passe" type="password" [value]="password()" (valueChange)="password.set($event)" autocomplete="current-password" required />
@@ -25,9 +25,9 @@ import { AuthService } from '../services/auth.service';
       <p class="mt-4 text-sm text-ardoise">
         Pas encore de compte ? <a routerLink="/inscription" class="font-semibold text-nuit underline decoration-soleil decoration-2">S'inscrire</a>
       </p>
-      <p class="mt-6 rounded-charte border border-filet p-3 text-xs text-ardoise">
+      <div class="mt-6 rounded-2xl border border-filet/80 bg-papier/70 p-4 text-xs text-ardoise leading-relaxed">
         Compte de démonstration : <b>walid&#64;demo.tn</b> / <b>demo1234</b> (conducteur) ou <b>sarra&#64;demo.tn</b> / <b>demo1234</b> (passagère).
-      </p>
+      </div>
     </section>
   `,
 })

@@ -14,7 +14,10 @@
   --font-titre: "Poppins", Georgia, serif;
   --font-texte: "Inter", "Helvetica Neue", Arial, sans-serif;
 
-  --radius-charte: 4px;
+  /* Rayons arrondis doux et modernes : adieu aux angles vifs et boîtes rigides */
+  --radius-charte: 16px;
+  --radius-card: 20px;
+  --radius-modal: 24px;
 }
 
 @layer base {

@@ -18,9 +18,9 @@ import { ButtonComponent } from './button.component';
           (click)="onCancel()"
         ></div>
 
-        <!-- Boîte de dialogue -->
+        <!-- Boîte de dialogue moderne et douce -->
         <div
-          class="relative w-full max-w-md rounded-charte border-2 border-nuit bg-papier p-6 shadow-xl transition-all"
+          class="relative w-full max-w-md rounded-3xl border border-filet/80 bg-white p-7 shadow-2xl transition-all"
         >
           <div class="flex items-start justify-between">
             <h2 [id]="titleId" class="text-xl font-titre font-bold text-nuit">
@@ -29,7 +29,7 @@ import { ButtonComponent } from './button.component';
             <button
               type="button"
               (click)="onCancel()"
-              class="flex h-8 w-8 items-center justify-center rounded-charte text-ardoise hover:bg-filet/50 hover:text-nuit"
+              class="flex h-8 w-8 items-center justify-center rounded-full text-ardoise hover:bg-papier hover:text-nuit transition-colors"
               aria-label="Fermer la boîte de dialogue"
             >
               ✕

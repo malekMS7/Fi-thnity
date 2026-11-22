@@ -6,9 +6,11 @@ import type { Ride } from '../types';
   selector: 'app-rating',
   template: `
     @if (rating() === null) {
-      <span class="text-sm text-ardoise">Nouveau</span>
+      <span class="inline-flex items-center rounded-full bg-papier px-2.5 py-0.5 text-xs font-medium text-ardoise border border-filet">Nouveau</span>
     } @else {
-      <span class="text-sm font-bold text-[#8A6410]">★ {{ rating() }} <span class="font-normal text-ardoise">({{ ride().driverReviews }})</span></span>
+      <span class="inline-flex items-center gap-1 rounded-full bg-soleil/15 px-2.5 py-0.5 text-xs font-bold text-[#8A6410]">
+        <span>★</span> {{ rating() }} <span class="font-normal text-ardoise text-[11px]">({{ ride().driverReviews }})</span>
+      </span>
     }
   `,
 })

@@ -29,24 +29,24 @@ const STATUS: Record<BookingStatus, { label: string; cls: string }> = {
             <p class="mt-1 text-sm text-ardoise">Suis tes réservations et tes trajets publiés en un coup d'œil.</p>
           </div>
           <div class="flex gap-3">
-            <a routerLink="/profil" class="inline-flex min-h-11 items-center rounded-charte border border-nuit px-4 text-xs font-semibold uppercase tracking-wider text-nuit hover:bg-nuit/5">
+            <a routerLink="/profil" class="inline-flex min-h-11 items-center rounded-full border border-nuit/30 bg-white px-5 text-xs font-semibold uppercase tracking-wider text-nuit hover:bg-papier transition-all shadow-2xs">
               Mon Profil
             </a>
-            <a routerLink="/publier" class="inline-flex min-h-11 items-center rounded-charte bg-nuit px-4 text-xs font-semibold uppercase tracking-wider text-papier hover:bg-nuit/90">
+            <a routerLink="/publier" class="inline-flex min-h-11 items-center rounded-full bg-nuit px-5 text-xs font-semibold uppercase tracking-wider text-papier hover:bg-nuit/90 transition-all shadow-xs">
               + Publier un trajet
             </a>
           </div>
         </div>
 
-        <dl class="mt-8 flex flex-wrap gap-x-16 gap-y-4 rounded-charte border border-filet bg-white p-6 shadow-xs">
+        <dl class="mt-8 flex flex-wrap gap-x-16 gap-y-4 rounded-3xl border border-filet/80 bg-white p-7 shadow-xs">
           <div><dd class="font-titre text-4xl font-bold text-corail">{{ upcoming().length }}</dd><dt class="text-xs font-bold uppercase tracking-wider text-ardoise mt-1">réservations à venir</dt></div>
           <div><dd class="font-titre text-4xl font-bold text-nuit">{{ rides().length }}</dd><dt class="text-xs font-bold uppercase tracking-wider text-ardoise mt-1">trajets publiés</dt></div>
           <div><dd class="font-titre text-4xl font-bold text-menthe">{{ passengers() }}</dd><dt class="text-xs font-bold uppercase tracking-wider text-ardoise mt-1">passagers transportés</dt></div>
         </dl>
 
-        <div class="mt-10 grid gap-10 md:grid-cols-2">
+        <div class="mt-10 grid gap-8 md:grid-cols-2">
           <!-- Colonne 1: Mes réservations -->
-          <div class="rounded-charte border border-filet bg-white p-6 shadow-xs">
+          <div class="rounded-3xl border border-filet/80 bg-white p-7 shadow-xs">
             <div class="flex items-center justify-between">
               <h2 class="text-xs font-bold uppercase tracking-widest text-corail">Mes réservations</h2>
               <a routerLink="/trajets" class="text-xs font-semibold underline decoration-soleil decoration-2 underline-offset-4">
@@ -56,11 +56,11 @@ const STATUS: Record<BookingStatus, { label: string; cls: string }> = {
 
             @if (bookings() === null) {
               <div class="mt-4 space-y-3" aria-label="Chargement de mes réservations">
-                <app-skeleton width="100%" height="3rem" />
-                <app-skeleton width="100%" height="3rem" />
+                <app-skeleton width="100%" height="3rem" rounded="rounded-xl" />
+                <app-skeleton width="100%" height="3rem" rounded="rounded-xl" />
               </div>
             } @else if (bookings()?.length === 0) {
-              <div class="mt-4 rounded-charte border border-dashed border-filet p-6 text-center">
+              <div class="mt-4 rounded-2xl border border-dashed border-filet/90 bg-papier/40 p-6 text-center">
                 <p class="text-sm text-ardoise">Tu n'as aucune réservation active.</p>
                 <a routerLink="/trajets" class="mt-2 inline-block font-semibold text-nuit underline decoration-soleil decoration-2">
                   Découvrir les trajets disponibles →
@@ -97,7 +97,7 @@ const STATUS: Record<BookingStatus, { label: string; cls: string }> = {
           </div>
 
           <!-- Colonne 2: Mes trajets publiés -->
-          <div class="rounded-charte border border-filet bg-white p-6 shadow-xs">
+          <div class="rounded-3xl border border-filet/80 bg-white p-7 shadow-xs">
             <div class="flex items-center justify-between">
               <h2 class="text-xs font-bold uppercase tracking-widest text-corail">Mes trajets publiés</h2>
               <a routerLink="/publier" class="text-xs font-semibold underline decoration-soleil decoration-2 underline-offset-4">
@@ -106,7 +106,7 @@ const STATUS: Record<BookingStatus, { label: string; cls: string }> = {
             </div>
 
             @if (rides().length === 0) {
-              <div class="mt-4 rounded-charte border border-dashed border-filet p-6 text-center">
+              <div class="mt-4 rounded-2xl border border-dashed border-filet/90 bg-papier/40 p-6 text-center">
                 <p class="text-sm text-ardoise">Tu n'as publié aucun trajet en tant que conducteur.</p>
                 <a routerLink="/publier" class="mt-2 inline-block font-semibold text-nuit underline decoration-soleil decoration-2">
                   Publier mon premier trajet →

@@ -10,7 +10,7 @@ import { ToastService, ToastType } from '../../core/toast.service';
         role="status"
         aria-live="polite"
         [class]="containerClass(toast.type)"
-        class="pointer-events-auto flex items-start justify-between gap-3 rounded-charte border p-4 shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-2"
+        class="pointer-events-auto flex items-start justify-between gap-3 rounded-2xl border p-4 shadow-xl backdrop-blur-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-2"
       >
         <div class="flex items-start gap-2.5">
           <span class="text-base leading-none">{{ iconFor(toast.type) }}</span>

@@ -32,7 +32,7 @@ interface Message {
 
     @if (ride(); as r) {
       <section class="grid gap-10 md:grid-cols-[1.3fr_1fr]">
-        <div class="rounded-charte border border-filet bg-white p-6 shadow-xs">
+        <div class="rounded-3xl border border-filet/80 bg-white p-7 shadow-xs">
           <span class="inline-block rounded-full bg-soleil/20 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-nuit">
             Détails de l'itinéraire
           </span>
@@ -74,7 +74,7 @@ interface Message {
           </dl>
 
           <!-- Zone de réservation -->
-          <div class="mt-8 rounded-charte border border-filet bg-papier p-5">
+          <div class="mt-8 rounded-2xl border border-filet/70 bg-papier/60 p-6 shadow-2xs">
             <h2 class="font-titre text-base font-bold text-nuit">Réserver ce trajet</h2>
 
             @if (isOwner()) {
@@ -83,7 +83,7 @@ interface Message {
                 <a routerLink="/tableau-de-bord" class="font-semibold text-nuit underline decoration-soleil decoration-2">tableau de bord</a>.
               </p>
             } @else if (full()) {
-              <div class="mt-2 rounded-charte border border-corail/30 bg-corail/10 p-3 text-sm font-semibold text-corail">
+              <div class="mt-2 rounded-2xl border border-corail/30 bg-corail/10 p-3 text-sm font-semibold text-corail">
                 Ce trajet est complet : toutes les places ont été réservées.
               </div>
             } @else {
@@ -93,7 +93,7 @@ interface Message {
                   <select
                     id="seats-select"
                     (change)="setSeats($event)"
-                    class="ml-2 min-h-11 rounded-charte border border-ardoise bg-white px-3 font-semibold text-nuit focus:border-soleil"
+                    class="ml-2 min-h-11 rounded-xl border border-ardoise/30 bg-white px-4 font-semibold text-nuit focus:border-soleil shadow-2xs transition-all"
                   >
                     @for (n of seatOptions(); track n) {
                       <option [value]="n" [selected]="n === seats()">{{ n }} place{{ n > 1 ? 's' : '' }}</option>
@@ -120,7 +120,7 @@ interface Message {
             }
 
             @if (message(); as m) {
-              <div role="status" class="mt-4 rounded-charte p-3 text-sm font-medium" [class]="m.type === 'ok' ? 'bg-menthe/10 text-menthe border border-menthe/30' : 'bg-corail/10 text-corail border border-corail/30'">
+              <div role="status" class="mt-4 rounded-xl p-3 text-sm font-medium" [class]="m.type === 'ok' ? 'bg-menthe/10 text-menthe border border-menthe/30' : 'bg-corail/10 text-corail border border-corail/30'">
                 {{ m.text }}
                 @if (m.type === 'ok') {
                   · <a routerLink="/tableau-de-bord" class="underline decoration-menthe font-semibold">Voir mes réservations</a>
@@ -132,10 +132,10 @@ interface Message {
 
         <!-- Colonne Conducteur & Avis -->
         <aside class="space-y-6">
-          <div class="rounded-charte border border-filet bg-white p-6 shadow-xs">
+          <div class="rounded-3xl border border-filet/80 bg-white p-7 shadow-xs">
             <p class="text-xs font-bold uppercase tracking-widest text-corail">Conducteur</p>
             <div class="mt-3 flex items-center gap-3">
-              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-nuit font-titre text-base font-bold text-soleil">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-nuit font-titre text-base font-bold text-soleil shadow-xs">
                 {{ r.driverName.charAt(0).toUpperCase() }}
               </div>
               <div>
@@ -177,7 +177,7 @@ interface Message {
               <!-- Formulaire interactif pour déposer un avis -->
               @if (session.user(); as currentUser) {
                 @if (!isOwner()) {
-                  <div class="mt-6 rounded-charte border border-filet bg-papier p-4">
+                  <div class="mt-6 rounded-2xl border border-filet/70 bg-papier/70 p-5 shadow-2xs">
                     <h5 class="font-titre text-xs font-bold uppercase tracking-wider text-nuit">Évaluer ce conducteur</h5>
                     <form (submit)="submitReview($event, r.driverId, currentUser.name)" class="mt-3 space-y-3">
                       <div>
@@ -203,7 +203,7 @@ interface Message {
                           [value]="newComment()"
                           (input)="newComment.set(inputValue($event))"
                           placeholder="Partage ton expérience : ponctualité, convivialité, propreté…"
-                          class="w-full rounded-charte border border-ardoise bg-white p-2 text-xs focus:border-soleil"
+                          class="w-full rounded-xl border border-ardoise/30 bg-white p-3 text-xs focus:border-soleil shadow-2xs transition-all"
                           required
                         ></textarea>
                       </div>
@@ -221,7 +221,7 @@ interface Message {
                   </div>
                 }
               } @else {
-                <div class="mt-4 rounded-charte border border-filet bg-papier p-3 text-xs text-ardoise">
+                <div class="mt-4 rounded-2xl border border-filet bg-papier p-3 text-xs text-ardoise">
                   <a routerLink="/connexion" class="font-semibold text-nuit underline decoration-soleil decoration-2 underline-offset-4">
                     Connecte-toi
                   </a> pour laisser un avis sur ce conducteur.
@@ -232,7 +232,7 @@ interface Message {
         </aside>
       </section>
     } @else if (ride() === null) {
-      <section class="rounded-charte border border-filet bg-white p-10 text-center">
+      <section class="rounded-3xl border border-filet/80 bg-white p-10 text-center shadow-xs">
         <h1 class="text-2xl font-titre font-bold text-nuit">Trajet introuvable</h1>
         <p class="mt-2 text-sm text-ardoise">Ce trajet n'existe plus ou a été annulé par le conducteur.</p>
         <a routerLink="/trajets" class="mt-5 inline-block text-sm font-semibold underline decoration-soleil decoration-2 underline-offset-4">
@@ -242,23 +242,23 @@ interface Message {
     } @else {
       <!-- Skeletons du détail de trajet -->
       <section class="grid gap-10 md:grid-cols-[1.3fr_1fr]">
-        <div class="space-y-4 rounded-charte border border-filet bg-white p-6">
-          <app-skeleton width="100px" height="1.25rem" />
-          <app-skeleton width="280px" height="2rem" />
-          <app-skeleton width="180px" height="1rem" />
+        <div class="space-y-4 rounded-3xl border border-filet/80 bg-white p-7 shadow-xs">
+          <app-skeleton width="100px" height="1.25rem" rounded="rounded-full" />
+          <app-skeleton width="280px" height="2rem" rounded="rounded-xl" />
+          <app-skeleton width="180px" height="1rem" rounded="rounded-lg" />
           <div class="mt-6 space-y-3 pt-4 border-t border-filet">
-            <app-skeleton width="100%" height="2rem" />
-            <app-skeleton width="100%" height="2rem" />
-            <app-skeleton width="100%" height="2rem" />
+            <app-skeleton width="100%" height="2.5rem" rounded="rounded-xl" />
+            <app-skeleton width="100%" height="2.5rem" rounded="rounded-xl" />
+            <app-skeleton width="100%" height="2.5rem" rounded="rounded-xl" />
           </div>
         </div>
-        <div class="space-y-4 rounded-charte border border-filet bg-white p-6">
-          <app-skeleton width="80px" height="1.25rem" />
+        <div class="space-y-4 rounded-3xl border border-filet/80 bg-white p-7 shadow-xs">
+          <app-skeleton width="80px" height="1.25rem" rounded="rounded-full" />
           <div class="flex items-center gap-3">
             <app-skeleton width="48px" height="48px" rounded="rounded-full" />
             <div class="space-y-2">
-              <app-skeleton width="120px" height="1.25rem" />
-              <app-skeleton width="90px" height="1rem" />
+              <app-skeleton width="120px" height="1.25rem" rounded="rounded-lg" />
+              <app-skeleton width="90px" height="1rem" rounded="rounded-md" />
             </div>
           </div>
         </div>

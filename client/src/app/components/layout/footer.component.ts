@@ -74,7 +74,10 @@ import { RouterLink } from '@angular/router';
         </div>
 
         <div class="mt-10 flex flex-col items-center justify-between gap-4 border-t border-filet pt-6 text-xs text-ardoise sm:flex-row">
-          <p>© 2026 Fi thnity · Covoiturage partagé en Tunisie</p>
+          <div>
+            <p>© 2026 Fi thnity · Covoiturage partagé en Tunisie</p>
+            <p class="mt-1 text-[11px] opacity-70">Projet étudiant · <span class="font-medium">Mohamed Laabidi &amp; Maled Slema</span> · SUP'COM</p>
+          </div>
           <div class="flex gap-4">
             <a routerLink="/contact" class="hover:underline">Contact</a>
             <span>·</span>

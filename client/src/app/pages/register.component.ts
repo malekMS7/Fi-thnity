@@ -22,19 +22,23 @@ interface RegisterForm {
   imports: [RouterLink, ButtonComponent, FieldComponent],
   host: { class: 'block' },
   template: `
-    <section class="mx-auto max-w-md">
+    <section class="mx-auto max-w-md rounded-3xl border border-filet/80 bg-white p-8 shadow-sm">
       <p class="text-xs font-bold uppercase tracking-widest text-corail">Inscription</p>
-      <h1 class="mt-1 text-3xl">Crée ton compte.</h1>
+      <h1 class="mt-1 text-3xl font-titre font-bold text-nuit">Crée ton compte.</h1>
       <form (submit)="handleSubmit($event)" novalidate class="mt-6 space-y-4">
         <app-field label="Nom complet" [value]="form().name" (valueChange)="set('name', $event)" [error]="errors().name" autocomplete="name" />
         <app-field label="Email" type="email" [value]="form().email" (valueChange)="set('email', $event)" [error]="errors().email" autocomplete="email" />
         <app-field label="Téléphone (optionnel)" type="tel" [value]="form().phone" (valueChange)="set('phone', $event)" [error]="errors().phone" autocomplete="tel" />
         <app-field label="Mot de passe" type="password" [value]="form().password" (valueChange)="set('password', $event)" [error]="errors().password" autocomplete="new-password" />
         <fieldset>
-          <legend class="text-sm font-medium">Je suis surtout</legend>
-          <div class="mt-1 flex gap-6 text-sm">
-            <label class="flex min-h-11 items-center gap-2"><input type="radio" name="role" [checked]="form().role === 'PASSENGER'" (change)="setRole('PASSENGER')" /> Passager</label>
-            <label class="flex min-h-11 items-center gap-2"><input type="radio" name="role" [checked]="form().role === 'DRIVER'" (change)="setRole('DRIVER')" /> Conducteur</label>
+          <legend class="text-sm font-medium text-nuit">Je suis surtout</legend>
+          <div class="mt-2 flex gap-3 text-sm">
+            <label class="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border border-filet bg-papier/60 px-4 py-2 cursor-pointer transition hover:bg-papier hover:border-nuit/30 select-none">
+              <input type="radio" name="role" [checked]="form().role === 'PASSENGER'" (change)="setRole('PASSENGER')" class="text-menthe" /> Passager
+            </label>
+            <label class="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border border-filet bg-papier/60 px-4 py-2 cursor-pointer transition hover:bg-papier hover:border-nuit/30 select-none">
+              <input type="radio" name="role" [checked]="form().role === 'DRIVER'" (change)="setRole('DRIVER')" class="text-menthe" /> Conducteur
+            </label>
           </div>
         </fieldset>
         @if (errors().form) {
@@ -42,7 +46,7 @@ interface RegisterForm {
         }
         <button app-button type="submit" class="w-full">Créer mon compte</button>
       </form>
-      <p class="mt-4 text-sm text-ardoise">Déjà inscrit ? <a routerLink="/connexion" class="font-semibold text-nuit underline decoration-soleil decoration-2">Se connecter</a></p>
+      <p class="mt-4 text-sm text-ardoise text-center">Déjà inscrit ? <a routerLink="/connexion" class="font-semibold text-nuit underline decoration-soleil decoration-2">Se connecter</a></p>
     </section>
   `,
 })

@@ -24,10 +24,11 @@ type Errors = Partial<Record<keyof PublishForm | 'form', string>>;
   imports: [ButtonComponent, FieldComponent],
   host: { class: 'block' },
   template: `
-    <section class="max-w-3xl">
+    <section class="mx-auto max-w-3xl rounded-3xl border border-filet/80 bg-white p-7 md:p-9 shadow-sm">
       <p class="text-xs font-bold uppercase tracking-widest text-corail">Publier un trajet</p>
-      <h1 class="mt-1 text-3xl">Où vas-tu ?</h1>
-      <form (submit)="handleSubmit($event)" novalidate class="mt-6 grid gap-x-8 gap-y-4 md:grid-cols-2">
+      <h1 class="mt-1 text-3xl font-titre font-bold text-nuit">Où vas-tu ?</h1>
+      <p class="mt-1 text-sm text-ardoise">Renseigne ton itinéraire pour proposer tes places disponibles aux autres étudiants.</p>
+      <form (submit)="handleSubmit($event)" novalidate class="mt-6 grid gap-x-8 gap-y-5 md:grid-cols-2">
         <app-field label="Départ" list="villes-tunisie" [value]="f().from" (valueChange)="set('from', $event)" [error]="errors().from" />
         <app-field label="Arrivée" list="villes-tunisie" [value]="f().to" (valueChange)="set('to', $event)" [error]="errors().to" />
         <app-field label="Date" type="date" [min]="today()" [value]="f().date" (valueChange)="set('date', $event)" [error]="errors().date" />
@@ -50,11 +51,11 @@ type Errors = Partial<Record<keyof PublishForm | 'form', string>>;
           <option value="La Manouba"></option>
         </datalist>
         <fieldset class="md:col-span-2">
-          <legend class="text-sm font-medium">Options</legend>
-          <div class="mt-1 flex flex-wrap gap-6 text-sm">
+          <legend class="text-sm font-medium text-nuit">Options & Préférences</legend>
+          <div class="mt-2 flex flex-wrap gap-3 text-sm">
             @for (o of allOptions; track o) {
-              <label class="flex min-h-11 items-center gap-2">
-                <input type="checkbox" [checked]="options().includes(o)" (change)="toggleOption(o)" /> {{ o }}
+              <label class="flex min-h-11 items-center gap-2 rounded-full border border-filet bg-papier/60 px-4 py-2 cursor-pointer transition hover:bg-papier hover:border-nuit/30 select-none">
+                <input type="checkbox" [checked]="options().includes(o)" (change)="toggleOption(o)" class="rounded-sm text-menthe" /> {{ o }}
               </label>
             }
           </div>
@@ -62,7 +63,7 @@ type Errors = Partial<Record<keyof PublishForm | 'form', string>>;
         @if (errors().form) {
           <p role="alert" class="text-sm text-corail md:col-span-2">Error : {{ errors().form }}</p>
         }
-        <div class="md:col-span-2"><button app-button type="submit" variant="accent">Publier le trajet</button></div>
+        <div class="md:col-span-2 pt-2"><button app-button type="submit" variant="accent">Publier le trajet</button></div>
       </form>
     </section>
   `,

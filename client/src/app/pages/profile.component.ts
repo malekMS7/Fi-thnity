@@ -19,9 +19,9 @@ import { inputValue } from '../utils/dom';
         <p class="mt-2 text-ardoise">Consulte et mets à jour tes informations personnelles.</p>
 
         <!-- Carte récapitulative -->
-        <div class="mt-8 flex flex-col gap-6 rounded-charte border border-filet bg-white p-6 shadow-xs sm:flex-row sm:items-center">
+        <div class="mt-8 flex flex-col gap-6 rounded-3xl border border-filet/80 bg-white p-7 shadow-xs sm:flex-row sm:items-center">
           <!-- Avatar avec initiales -->
-          <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-nuit font-titre text-2xl font-bold text-soleil">
+          <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-nuit font-titre text-2xl font-bold text-soleil shadow-xs">
             {{ initials() }}
           </div>
 
@@ -56,12 +56,12 @@ import { inputValue } from '../utils/dom';
         </div>
 
         <!-- Formulaire d'édition -->
-        <div class="mt-8 rounded-charte border border-filet bg-white p-6 shadow-xs">
+        <div class="mt-8 rounded-3xl border border-filet/80 bg-white p-7 shadow-xs">
           <h2 class="text-lg font-titre font-semibold text-nuit">Modifier mes informations</h2>
           <p class="mt-1 text-sm text-ardoise">Ces informations permettent aux conducteurs et passagers de te reconnaître lors de la prise en charge.</p>
 
           @if (saved()) {
-            <div role="status" class="mt-4 rounded-charte border border-menthe/30 bg-menthe/10 p-3 text-sm text-menthe">
+            <div role="status" class="mt-4 rounded-xl border border-menthe/30 bg-menthe/10 p-3.5 text-sm text-menthe font-medium">
               Vos informations ont été mises à jour avec succès !
             </div>
           }
@@ -86,7 +86,7 @@ import { inputValue } from '../utils/dom';
                 type="email"
                 [value]="user.email"
                 disabled
-                class="mt-1 min-h-11 w-full rounded-charte border border-filet bg-papier px-3 text-sm text-ardoise cursor-not-allowed"
+                class="mt-1.5 min-h-11 w-full rounded-xl border border-filet/80 bg-papier/70 px-4 text-sm text-ardoise cursor-not-allowed"
               />
               <p class="mt-1 text-xs text-ardoise">L'adresse email ne peut pas être modifiée pour des raisons de sécurité.</p>
             </div>
@@ -107,7 +107,7 @@ import { inputValue } from '../utils/dom';
                 [value]="form().bio"
                 (input)="setField('bio', inputValue($event))"
                 placeholder="Ex. Étudiant, trajets fréquents les vendredis vers Sfax…"
-                class="mt-1 w-full rounded-charte border border-ardoise bg-white p-3 text-sm focus:border-soleil"
+                class="mt-1.5 w-full rounded-xl border border-ardoise/30 bg-white p-3 text-sm focus:border-soleil focus:ring-3 focus:ring-soleil/20 shadow-2xs transition-all"
               ></textarea>
               <p class="mt-1 text-xs text-ardoise">Une brève présentation rassure la communauté et facilite la prise de contact.</p>
             </div>
@@ -122,7 +122,7 @@ import { inputValue } from '../utils/dom';
 
         <!-- Raccourcis utiles -->
         <div class="mt-8 grid gap-4 sm:grid-cols-2">
-          <div class="rounded-charte border border-filet bg-papier p-4">
+          <div class="rounded-2xl border border-filet/70 bg-white p-5 shadow-xs">
             <h3 class="font-titre text-sm font-bold text-nuit">Besoin d'un trajet ?</h3>
             <p class="mt-1 text-xs text-ardoise">Recherche parmi des dizaines d'itinéraires interurbains et réservez en quelques clics.</p>
             <a routerLink="/trajets" class="mt-2 inline-block text-xs font-semibold underline decoration-soleil decoration-2 underline-offset-4">
@@ -130,7 +130,7 @@ import { inputValue } from '../utils/dom';
             </a>
           </div>
 
-          <div class="rounded-charte border border-filet bg-papier p-4">
+          <div class="rounded-2xl border border-filet/70 bg-white p-5 shadow-xs">
             <h3 class="font-titre text-sm font-bold text-nuit">Tu prends le volant ?</h3>
             <p class="mt-1 text-xs text-ardoise">Propose tes places disponibles pour amortir tes frais d'essence et de péage.</p>
             <a routerLink="/publier" class="mt-2 inline-block text-xs font-semibold underline decoration-soleil decoration-2 underline-offset-4">

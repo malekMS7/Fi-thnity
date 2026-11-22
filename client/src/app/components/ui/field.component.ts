@@ -52,6 +52,10 @@ export class FieldComponent {
   protected readonly inputValue = inputValue;
 
   protected readonly inputClass = computed(
-    () => `mt-1 min-h-11 w-full rounded-charte border bg-white px-3 ${this.error() ? 'border-corail' : 'border-ardoise'}`,
+    () => `mt-1.5 min-h-11 w-full rounded-xl border bg-white px-4 text-sm transition-all focus:outline-hidden ${
+      this.error()
+        ? 'border-corail focus:border-corail focus:ring-3 focus:ring-corail/15'
+        : 'border-ardoise/30 focus:border-soleil focus:ring-3 focus:ring-soleil/20 shadow-2xs'
+    }`,
   );
 }

@@ -29,10 +29,10 @@ const FILTERS: Filter[] = [
       <p class="text-xs font-bold uppercase tracking-widest text-corail">Recherche</p>
       <h1 class="mt-1 text-3xl font-titre font-bold">Trouve ton trajet</h1>
 
-      <form (submit)="submit($event)" class="mt-6 grid gap-3 md:grid-cols-4">
-        <input list="villes-tunisie" class="min-h-11 rounded-charte border border-ardoise bg-white px-3 focus:border-soleil" placeholder="Départ (ex. Sfax)" aria-label="Ville de départ" [value]="form().depart" (input)="setField('depart', inputValue($event))" />
-        <input list="villes-tunisie" class="min-h-11 rounded-charte border border-ardoise bg-white px-3 focus:border-soleil" placeholder="Arrivée (ex. Tunis)" aria-label="Ville d'arrivée" [value]="form().arrivee" (input)="setField('arrivee', inputValue($event))" />
-        <input type="date" class="min-h-11 rounded-charte border border-ardoise bg-white px-3 focus:border-soleil" aria-label="Date" [value]="form().date" (input)="setField('date', inputValue($event))" />
+      <form (submit)="submit($event)" class="mt-6 grid gap-4 rounded-3xl border border-filet/90 bg-white p-5 shadow-sm md:grid-cols-4">
+        <input list="villes-tunisie" class="min-h-11 rounded-xl border border-filet/90 bg-papier/40 px-4 text-sm focus:border-soleil focus:bg-white focus:ring-3 focus:ring-soleil/20 shadow-2xs transition-all" placeholder="Départ (ex. Sfax)" aria-label="Ville de départ" [value]="form().depart" (input)="setField('depart', inputValue($event))" />
+        <input list="villes-tunisie" class="min-h-11 rounded-xl border border-filet/90 bg-papier/40 px-4 text-sm focus:border-soleil focus:bg-white focus:ring-3 focus:ring-soleil/20 shadow-2xs transition-all" placeholder="Arrivée (ex. Tunis)" aria-label="Ville d'arrivée" [value]="form().arrivee" (input)="setField('arrivee', inputValue($event))" />
+        <input type="date" class="min-h-11 rounded-xl border border-filet/90 bg-papier/40 px-4 text-sm focus:border-soleil focus:bg-white focus:ring-3 focus:ring-soleil/20 shadow-2xs transition-all" aria-label="Date" [value]="form().date" (input)="setField('date', inputValue($event))" />
         <button app-button type="submit" variant="accent">Rechercher</button>
         <datalist id="villes-tunisie">
           <option value="Tunis"></option>
@@ -59,21 +59,21 @@ const FILTERS: Filter[] = [
       <div class="mt-6" aria-live="polite">
         @if (rides(); as list) {
           @if (list.length === 0) {
-            <div class="mt-8 rounded-charte border border-filet bg-white p-8 text-center">
-              <span class="text-3xl">🚗</span>
-              <h2 class="mt-3 font-titre text-lg font-bold text-nuit">Aucun trajet ne correspond</h2>
+            <div class="mt-8 rounded-3xl border border-filet/80 bg-white p-10 text-center shadow-xs">
+              <span class="text-4xl">🚗</span>
+              <h2 class="mt-3 font-titre text-xl font-bold text-nuit">Aucun trajet ne correspond</h2>
               <p class="mt-1 text-sm text-ardoise max-w-md mx-auto">
                 Aucun trajet ne répond exactement à tes critères. Essaie d'élargir ta date ou d'ajuster tes filtres de recherche.
               </p>
-              <div class="mt-5 flex justify-center gap-3">
+              <div class="mt-6 flex justify-center gap-3">
                 <button type="button" (click)="resetFilters()" class="text-sm font-semibold underline decoration-soleil decoration-2 underline-offset-4">
                   Réinitialiser la recherche
                 </button>
               </div>
             </div>
           } @else {
-            <p class="text-sm text-ardoise">{{ list.length }} trajet{{ list.length > 1 ? 's' : '' }} trouvé{{ list.length > 1 ? 's' : '' }}</p>
-            <ul class="mt-2 border-t border-filet">
+            <p class="text-sm font-medium text-ardoise mb-3">{{ list.length }} trajet{{ list.length > 1 ? 's' : '' }} disponible{{ list.length > 1 ? 's' : '' }}</p>
+            <ul class="space-y-3">
               @for (r of list; track r.id) {
                 <li app-ride-card [ride]="r"></li>
               }
@@ -81,20 +81,20 @@ const FILTERS: Filter[] = [
           }
         } @else {
           <!-- Skeleton Loading -->
-          <div class="mt-4 space-y-4" aria-label="Chargement des trajets">
+          <div class="mt-4 space-y-3.5" aria-label="Chargement des trajets">
             @for (i of [1, 2, 3, 4]; track i) {
-              <div class="flex flex-col gap-3 rounded-charte border border-filet bg-white p-4 sm:flex-row sm:items-center">
-                <div class="space-y-2 sm:w-48">
-                  <app-skeleton width="120px" height="1.25rem" />
-                  <app-skeleton width="80px" height="0.875rem" />
+              <div class="flex flex-col gap-3 rounded-2xl border border-filet/70 bg-white p-5 sm:flex-row sm:items-center shadow-xs">
+                <div class="space-y-2 sm:w-56">
+                  <app-skeleton width="140px" height="1.25rem" rounded="rounded-lg" />
+                  <app-skeleton width="90px" height="0.875rem" rounded="rounded-md" />
                 </div>
                 <div class="flex-1 space-y-2">
-                  <app-skeleton width="220px" height="1.25rem" />
+                  <app-skeleton width="240px" height="1.25rem" rounded="rounded-lg" />
                 </div>
-                <div class="flex items-center gap-4">
-                  <app-skeleton width="70px" height="1rem" />
-                  <app-skeleton width="60px" height="1.25rem" />
-                  <app-skeleton width="45px" height="1.5rem" />
+                <div class="flex items-center gap-3">
+                  <app-skeleton width="70px" height="1.5rem" rounded="rounded-full" />
+                  <app-skeleton width="60px" height="1.5rem" rounded="rounded-full" />
+                  <app-skeleton width="50px" height="2rem" rounded="rounded-full" />
                 </div>
               </div>
             }

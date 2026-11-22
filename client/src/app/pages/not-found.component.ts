@@ -27,7 +27,7 @@ import { ButtonComponent } from '../components/ui/button.component';
         </a>
       </div>
 
-      <div class="mt-12 rounded-charte border border-filet bg-papier p-4 text-xs text-ardoise">
+      <div class="mt-12 rounded-2xl border border-filet/80 bg-white p-5 text-xs text-ardoise shadow-xs">
         Besoin d'un renseignement ou d'aide ? <a routerLink="/contact" class="font-semibold text-nuit underline decoration-soleil decoration-2 underline-offset-4">Écris au support</a>.
       </div>
     </section>

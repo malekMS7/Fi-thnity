@@ -15,10 +15,10 @@ import { SessionService } from '../../core/session.service';
           <span class="rounded-full bg-soleil px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase text-nuit">TN</span>
         </a>
 
-        <!-- Bouton hamburger (mobile) -->
+        <!-- Bouton hamburger (mobile) arrondi en cercle -->
         <button
           type="button"
-          class="flex h-11 w-11 items-center justify-center rounded-charte border border-nuit text-nuit transition hover:bg-nuit/5 md:hidden"
+          class="flex h-11 w-11 items-center justify-center rounded-full border border-ardoise/30 text-nuit transition hover:bg-nuit/5 md:hidden"
           (click)="open.set(!open())"
           [attr.aria-expanded]="open()"
           aria-controls="main-menu"
@@ -92,7 +92,7 @@ import { SessionService } from '../../core/session.service';
               <a
                 routerLink="/inscription"
                 (click)="close()"
-                class="inline-flex min-h-11 items-center rounded-charte bg-nuit px-4 text-sm font-semibold text-papier transition hover:bg-nuit/90"
+                class="inline-flex min-h-11 items-center rounded-full bg-nuit px-5 text-sm font-semibold text-papier transition hover:bg-nuit/90 shadow-xs hover:shadow-md"
               >
                 S'inscrire
               </a>

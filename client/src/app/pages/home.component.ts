@@ -32,17 +32,17 @@ interface PopularRoute {
             La solution pensée pour les étudiants et actifs en Tunisie. Rejoins notre communauté universitaire pour voyager sereinement, à prix équitable et en toute convivialité.
           </p>
 
-          <!-- Formulaire de recherche héro -->
+          <!-- Formulaire de recherche héro moderne & arrondi -->
           <form
             (submit)="handleSubmit($event)"
-            class="mt-8 grid gap-3 rounded-charte border-2 border-nuit bg-white p-4 shadow-md sm:grid-cols-2 md:grid-cols-4"
+            class="mt-8 grid gap-4 rounded-3xl border border-filet/90 bg-white p-5 shadow-xl sm:grid-cols-2 md:grid-cols-4"
           >
             <div>
-              <label for="home-depart" class="block text-xs font-bold uppercase tracking-wider text-ardoise">Départ</label>
+              <label for="home-depart" class="block text-xs font-bold uppercase tracking-wider text-ardoise mb-1">Départ</label>
               <input
                 id="home-depart"
                 list="villes-tunisie"
-                class="mt-1 min-h-11 w-full rounded-charte border border-filet px-3 text-sm focus:border-soleil"
+                class="min-h-11 w-full rounded-xl border border-filet/90 bg-papier/40 px-4 text-sm focus:border-soleil focus:bg-white focus:ring-3 focus:ring-soleil/20 shadow-2xs transition-all"
                 placeholder="Ex. Tunis, Sfax…"
                 [value]="depart()"
                 (input)="depart.set(inputValue($event))"
@@ -50,11 +50,11 @@ interface PopularRoute {
             </div>
 
             <div>
-              <label for="home-arrivee" class="block text-xs font-bold uppercase tracking-wider text-ardoise">Arrivée</label>
+              <label for="home-arrivee" class="block text-xs font-bold uppercase tracking-wider text-ardoise mb-1">Arrivée</label>
               <input
                 id="home-arrivee"
                 list="villes-tunisie"
-                class="mt-1 min-h-11 w-full rounded-charte border border-filet px-3 text-sm focus:border-soleil"
+                class="min-h-11 w-full rounded-xl border border-filet/90 bg-papier/40 px-4 text-sm focus:border-soleil focus:bg-white focus:ring-3 focus:ring-soleil/20 shadow-2xs transition-all"
                 placeholder="Ex. Sousse, Bizerte…"
                 [value]="arrivee()"
                 (input)="arrivee.set(inputValue($event))"
@@ -62,12 +62,12 @@ interface PopularRoute {
             </div>
 
             <div>
-              <label for="home-date" class="block text-xs font-bold uppercase tracking-wider text-ardoise">Date</label>
+              <label for="home-date" class="block text-xs font-bold uppercase tracking-wider text-ardoise mb-1">Date</label>
               <input
                 id="home-date"
                 type="date"
                 [min]="today()"
-                class="mt-1 min-h-11 w-full rounded-charte border border-filet px-3 text-sm focus:border-soleil"
+                class="min-h-11 w-full rounded-xl border border-filet/90 bg-papier/40 px-4 text-sm focus:border-soleil focus:bg-white focus:ring-3 focus:ring-soleil/20 shadow-2xs transition-all"
                 [value]="date()"
                 (input)="date.set(inputValue($event))"
               />
@@ -124,11 +124,11 @@ interface PopularRoute {
           @for (route of popularRoutes; track route.from + route.to) {
             <div
               (click)="selectRoute(route.from, route.to)"
-              class="group cursor-pointer rounded-charte border border-filet bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-nuit hover:shadow-xs"
+              class="group cursor-pointer rounded-2xl border border-filet/70 bg-white p-5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-soleil/50 hover:shadow-md"
             >
               <div class="flex items-center justify-between text-xs font-semibold text-corail">
                 <span>{{ route.duration }}</span>
-                <span class="text-menthe">{{ route.price }}</span>
+                <span class="rounded-full bg-menthe/10 px-2 py-0.5 text-menthe font-bold">{{ route.price }}</span>
               </div>
               <h3 class="mt-2 text-base font-titre font-bold text-nuit group-hover:text-menthe">
                 {{ route.from }} → {{ route.to }}
@@ -140,7 +140,7 @@ interface PopularRoute {
       </section>
 
       <!-- Comment ça marche ? -->
-      <section class="mt-16 rounded-charte border border-filet bg-white p-8 md:p-12">
+      <section class="mt-16 rounded-3xl border border-filet/70 bg-white p-8 md:p-12 shadow-sm">
         <div class="text-center">
           <p class="text-xs font-bold uppercase tracking-widest text-corail">Simplicité & Efficacité</p>
           <h2 class="mt-1 text-3xl font-titre font-bold">Comment fonctionne Fi thnity ?</h2>
@@ -152,7 +152,7 @@ interface PopularRoute {
         <div class="mt-10 grid gap-8 md:grid-cols-3">
           <!-- Étape 1 -->
           <div class="relative flex flex-col items-center text-center">
-            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-nuit font-titre text-xl font-bold text-soleil">
+            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-nuit font-titre text-xl font-bold text-soleil shadow-sm">
               1
             </div>
             <h3 class="mt-4 text-lg font-titre font-bold text-nuit">Cherche ou publie</h3>
@@ -163,7 +163,7 @@ interface PopularRoute {
 
           <!-- Étape 2 -->
           <div class="relative flex flex-col items-center text-center">
-            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-soleil font-titre text-xl font-bold text-nuit">
+            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-soleil font-titre text-xl font-bold text-nuit shadow-sm">
               2
             </div>
             <h3 class="mt-4 text-lg font-titre font-bold text-nuit">Réserve en 1 clic</h3>
@@ -174,7 +174,7 @@ interface PopularRoute {
 
           <!-- Étape 3 -->
           <div class="relative flex flex-col items-center text-center">
-            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-menthe font-titre text-xl font-bold text-papier">
+            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-menthe font-titre text-xl font-bold text-papier shadow-sm">
               3
             </div>
             <h3 class="mt-4 text-lg font-titre font-bold text-nuit">Voyage & Partage</h3>
@@ -191,7 +191,7 @@ interface PopularRoute {
         <h2 class="mt-1 text-2xl font-titre font-semibold md:text-3xl">Conçu par et pour la communauté</h2>
 
         <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div class="rounded-charte border border-filet bg-papier p-5">
+          <div class="rounded-2xl border border-filet/60 bg-white p-6 shadow-xs hover:shadow-md transition-all">
             <span class="text-2xl">💰</span>
             <h3 class="mt-3 font-titre text-base font-bold text-nuit">Économique</h3>
             <p class="mt-1 text-sm text-ardoise leading-relaxed">
@@ -199,7 +199,7 @@ interface PopularRoute {
             </p>
           </div>
 
-          <div class="rounded-charte border border-filet bg-papier p-5">
+          <div class="rounded-2xl border border-filet/60 bg-white p-6 shadow-xs hover:shadow-md transition-all">
             <span class="text-2xl">🛡️</span>
             <h3 class="mt-3 font-titre text-base font-bold text-nuit">Confiance & Sécurité</h3>
             <p class="mt-1 text-sm text-ardoise leading-relaxed">
@@ -207,7 +207,7 @@ interface PopularRoute {
             </p>
           </div>
 
-          <div class="rounded-charte border border-filet bg-papier p-5">
+          <div class="rounded-2xl border border-filet/60 bg-white p-6 shadow-xs hover:shadow-md transition-all">
             <span class="text-2xl">🌿</span>
             <h3 class="mt-3 font-titre text-base font-bold text-nuit">Écologique</h3>
             <p class="mt-1 text-sm text-ardoise leading-relaxed">
@@ -215,7 +215,7 @@ interface PopularRoute {
             </p>
           </div>
 
-          <div class="rounded-charte border border-filet bg-papier p-5">
+          <div class="rounded-2xl border border-filet/60 bg-white p-6 shadow-xs hover:shadow-md transition-all">
             <span class="text-2xl">🎓</span>
             <h3 class="mt-3 font-titre text-base font-bold text-nuit">Esprit Campus</h3>
             <p class="mt-1 text-sm text-ardoise leading-relaxed">
@@ -226,7 +226,7 @@ interface PopularRoute {
       </section>
 
       <!-- Bannière Conducteur (CTA) -->
-      <section class="mt-16 rounded-charte bg-nuit p-8 text-papier md:p-12">
+      <section class="mt-16 rounded-3xl bg-nuit p-8 text-papier md:p-12 shadow-xl">
         <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div class="max-w-xl">
             <span class="text-xs font-bold uppercase tracking-widest text-soleil">Espace Conducteurs</span>

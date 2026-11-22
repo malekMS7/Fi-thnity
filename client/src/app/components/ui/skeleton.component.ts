@@ -12,7 +12,7 @@ import { Component, computed, input } from '@angular/core';
 export class SkeletonComponent {
   readonly width = input<string>('100%');
   readonly height = input<string>('1rem');
-  readonly rounded = input<string>('rounded-charte');
+  readonly rounded = input<string>('rounded-xl');
   readonly className = input<string>('');
 
   protected readonly classes = computed(
